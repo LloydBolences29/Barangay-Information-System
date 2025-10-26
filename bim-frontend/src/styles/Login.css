@@ -1,0 +1,14 @@
+#login-main-container{
+    height: 100vh;
+    display: flex;
+    gap: 3em;
+    flex-direction: column;
+    justify-content: center;
+}
+
+@media only screen and (max-width: 768px){
+    #login-main-container{
+
+    }
+
+}

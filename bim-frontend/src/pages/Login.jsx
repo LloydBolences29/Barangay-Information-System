@@ -1,5 +1,6 @@
 import React from "react";
 import { Container, Form, Button } from "react-bootstrap";
+import '../styles/Login.css'
 
 const Login = () => {
 
@@ -10,10 +11,10 @@ const Login = () => {
     }
   return (
     <div>
-      <Container>
+      <Container id="login-main-container">
 
-        <div id="welcome-header-text" className="d-flex justify-content-center">
-            <h1 className="text-center m-3 mb-0 w-50">Welcome to Barangay Information Management System</h1>
+        <div id="welcome-header-text">
+            <h1>Welcome to Barangay Information Management System</h1>
         </div>
         <div
           id="login-container"
@@ -21,7 +22,6 @@ const Login = () => {
         >
           <div
             id="login-wrapper"
-            className="d-flex flex-column justify-content-center align-items-center w-50 gap-3 p-5 border-1 rounded-5 shadow-lg"
           >
             {/* <div id="login-content" className="p-5"> */}
               <h2>Login</h2>
