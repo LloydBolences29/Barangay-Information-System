@@ -11,7 +11,7 @@ const UserManagement = () => {
   });
   const [confirmPassword, setConfirmPassword] = useState("");
   const [openModal, setOpenModal] = useState(false);
-  const API_URL = import.meta.env.REACT_PUBLIC_API_URL;
+  const API_URL = import.meta.env.VITE_API_URL;
   //check the password and the confirm password fields match
   const isPasswordValid = () => {
     if (payload.user_password !== confirmPassword) {
@@ -35,6 +35,8 @@ const UserManagement = () => {
         headers: { "Content-Type": "application/json"  },
         body: JSON.stringify(payload)
     });
+
+    console.log("Response:", payload);
       if (res.ok) {
         const data = await res.json();
         console.log("User registered successfully:", data);
