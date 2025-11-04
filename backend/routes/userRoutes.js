@@ -46,15 +46,13 @@ router.post("/login", async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: false,
-      sameSite: "lax",
+      sameSite: "Lax",
       maxAge: 3600000,
     }); // 1 hour
-    return res
-      .status(200)
-      .json({
-        message: "Login successful",
-        user: { id: user.id, username: user.username, role: user.user_role },
-      });
+    return res.status(200).json({
+      message: "Login successful",
+      user: { id: user.id, username: user.username, role: user.user_role },
+    });
   } catch (error) {
     console.error("Error during user login:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -63,13 +61,8 @@ router.post("/login", async (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
-    const {
-      firstName,
-      lastName,
-      username,
-      user_password,
-      user_role
-    } = req.body;
+    const { firstName, lastName, username, user_password, user_role } =
+      req.body;
 
     console.log("Registering user:", req.body);
 
@@ -133,6 +126,44 @@ router.get("/auth", async (req, res) => {
   } catch (error) {
     console.error("Error during fetching authenticated user:", error);
     return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.get("/get-all-users", async (req, res) => {
+  try {
+    const db = await connectToDatabase();
+
+    const sql =
+      "SELECT id, firstname, lastname, username, user_role, is_active FROM user_info";
+    const [rows] = await db.execute(sql);
+
+    return res
+      .status(200)
+      .json({ message: "Users fetched successfully", users: rows });
+  } catch (error) {
+    console.log(
+      "Error in Getting the user's information. Please check your console."
+    );
+    return res
+      .status(500)
+      .json({ message: "Internal server error. Plase check your server logs" });
+  }
+});
+
+//logout user
+router.post("/logout", async (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "Lax",
+    });
+    res.status(200).json({ message: "Logout successfully. Plase wait while navigate to Log in Page." });
+  } catch (error) {
+    console.error("Error during user logout:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error. Please contact your admin" });
   }
 });
 

@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 const Login = () => {
   const VITE_API_URL = import.meta.env.VITE_API_URL;
 
-  const { loading, setAuth } = useAuth();
+  const { loading, setAuth, auth } = useAuth();
   const navigate = useNavigate();
   const [payload, setPayload] = useState({
     username: "",
@@ -37,12 +37,15 @@ const Login = () => {
         setAuth({
           loading: false,
           isAuthenticated: true,
-          user: res.data.user,
+          user: res.user.role,
         });
 
-        switch (res.data.user.role) {
+        switch (res.user.role) {
           case "admin":
-            navigate("/user-management");
+            navigate("/admin");
+            break;
+          case "secretary":
+            navigate("/secretary");
             break;
           // Add more roles and their respective redirects as needed
           default:
