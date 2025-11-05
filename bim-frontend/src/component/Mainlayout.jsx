@@ -92,7 +92,7 @@ const Mainlayout = ({
               <ul id="sidebar-nav-list">
                 {componentLabel &&
                   componentLabel.map((label) => (
-                    <li key={label}>
+                    <li key={label.key}>
                       <Button
                         onClick={() => handleOnclick(`${label.key}`)}
                         className="nav-button"

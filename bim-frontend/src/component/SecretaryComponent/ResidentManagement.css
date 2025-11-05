@@ -1,0 +1,30 @@
+#header-title{
+    text-align: center;
+}
+
+#ris-main-wrapper{
+    padding: 1.2rem;
+    height: 100vh;
+    border: 2px solid #ccc;
+    border-radius: 15px;
+}
+
+#ris-actions{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+#search-actions{
+    min-height: auto;
+    display: flex;
+    align-items: baseline;
+    gap: 1em;
+}
+#ris-actions #search-input{
+    width: 300px;
+    height: 100%;
+    padding: 0.2em 0.5em;
+    border-radius: 25px;
+}
