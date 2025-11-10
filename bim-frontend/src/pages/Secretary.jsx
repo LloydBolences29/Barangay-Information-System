@@ -7,7 +7,7 @@ const Secretary = () => {
     const [activeComponent, setActiveComponent] = useState("dashboard");
 
     const componentLabel = [
-    { key: "dashboard", label: "Resident Information System" },
+    { key: "dashboard", label: "Dashboard" },
     { key: "resident-information-system", label: "Resident Information System" },
     
     ]
