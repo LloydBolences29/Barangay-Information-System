@@ -17,15 +17,14 @@ function App() {
         <Suspense fallback={<div>Loading...</div>}>
           <Routes>
             <Route path="/" element={<LoginForm />} />
-            <Route path="/secretary" element={<SecretaryPage />} />
 
             <Route element={<ProtectedRoutes allowedRoles={["admin"]} />}>
               <Route path="/user-management" element={<UserManagement />} />
               <Route path="/admin" element={<AdminPage />} />
             </Route>
-            <Route
-              element={<ProtectedRoutes allowedRoles={["secretary"]} />}
-            ></Route>
+            <Route element={<ProtectedRoutes allowedRoles={["secretary"]} />}>
+              <Route path="/secretary" element={<SecretaryPage />} />
+            </Route>
           </Routes>
         </Suspense>
       </AuthProvider>

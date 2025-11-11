@@ -7,27 +7,27 @@ const AddressInfoForm = ({ formData, handleChange }) => {
         <Grid item xs={12}>
           <TextField
             fullWidth
-            name="profession"
-            label="Profession"
-            value={formData.profession}
+            name="occupation"
+            label="occupation"
+            value={formData.occupation}
             onChange={handleChange}
           />
         </Grid>
         <Grid item xs={12} sm={4}>
           <TextField
             fullWidth
-            name="houseNumber"
+            name="house_no"
             label="House No. / Blk / Lot"
-            value={formData.houseNumber}
+            value={formData.house_no}
             onChange={handleChange}
           />
         </Grid>
         <Grid item xs={12} sm={8}>
           <TextField
             fullWidth
-            name="streetName"
+            name="street"
             label="Street Name"
-            value={formData.streetName}
+            value={formData.street}
             onChange={handleChange}
           />
         </Grid>
@@ -36,9 +36,9 @@ const AddressInfoForm = ({ formData, handleChange }) => {
             fullWidth
             multiline
             rows={3}
-            name="fullAddress"
+            name="address"
             label="Full Address (e.g., Purok, Barangay, City)"
-            value={formData.fullAddress}
+            value={formData.address}
             onChange={handleChange}
           />
         </Grid>

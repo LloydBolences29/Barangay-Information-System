@@ -8,7 +8,7 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
-const StepperComponent = ({ steps }) => {
+const StepperComponent = ({ steps, onFinalSubmit }) => {
   const [activeStep, setActiveStep] = useState(0);
 
   const handleNext = () => {
@@ -22,9 +22,15 @@ const StepperComponent = ({ steps }) => {
   const handleReset = () => {
     setActiveStep(0);
   };
+
+  const handleSubmit = async () =>{
+    onFinalSubmit();
+  }
   return (
     <div>
-      <Box sx={{ maxWidth: 400 }}>
+
+
+      <Box sx={{ width: '100%' }}>
         <Stepper activeStep={activeStep} orientation="vertical">
           {steps.map((step, index) => (
             <Step key={step.label}>
@@ -42,7 +48,7 @@ const StepperComponent = ({ steps }) => {
                 <Box sx={{ mb: 2 }}>
                   <Button
                     variant="contained"
-                    onClick={handleNext}
+                    onClick={index === steps.length - 1 ? handleSubmit : handleNext}
                     sx={{ mt: 1, mr: 1 }}
                   >
                     {index === steps.length - 1 ? "Finish" : "Continue"}
@@ -68,6 +74,8 @@ const StepperComponent = ({ steps }) => {
           </Paper>
         )}
       </Box>
+
+
     </div>
   );
 };

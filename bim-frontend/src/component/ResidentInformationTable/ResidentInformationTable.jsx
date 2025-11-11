@@ -22,8 +22,8 @@ const ResidentInformationTable = () => {
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
             <TabList onChange={handleChange} aria-label="lab API tabs example">
               <Tab label="Basic Information" value="1" />
-              <Tab label="Item Two" value="2" />
-              <Tab label="Item Three" value="3" />
+              <Tab label="Household Information" value="2" />
+              <Tab label="Requests" value="3" />
             </TabList>
           </Box>
           <TabPanel value="1"><Suspense fallback={<div>Loading...</div>}><BasicInformationComponent /></Suspense></TabPanel>

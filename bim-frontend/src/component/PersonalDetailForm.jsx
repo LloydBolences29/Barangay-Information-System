@@ -25,18 +25,22 @@ const PersonalDetailForm = ({ formData, handleChange }) => {
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          name="placeOfBirth"
+          name="place_of_birth"
           label="Place of Birth"
-          value={formData.placeOfBirth}
+          value={formData.place_of_birth}
           onChange={handleChange}
         />
       </Grid>
 
       {/* --- Row 2 --- */}
-      <Grid item xs={12} sm={6}>
-        {" "}
-        {/* <-- This is the fix */}
-        <FormControl fullWidth>
+      <Grid
+        item
+        xs={12}
+        sm={12}
+        lg={12}
+        sx={{ display: "block", width: "100%" }}
+      >
+        <FormControl fullWidth sx={{ width: "20%" }}>
           <InputLabel id="sex-label">Sex</InputLabel>
           <Select
             labelId="sex-label"
@@ -53,13 +57,19 @@ const PersonalDetailForm = ({ formData, handleChange }) => {
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={12} sm={6}>
-        <FormControl fullWidth>
+      <Grid
+        item
+        xs={12}
+        sm={12}
+        lg={12}
+        sx={{ display: "block", width: "100%" }}
+      >
+        <FormControl fullWidth sx={{ width: "20%" }}>
           <InputLabel id="civil-status-label">Civil Status</InputLabel>
           <Select
             labelId="civil-status-label"
-            name="civilStatus"
-            value={formData.civilStatus}
+            name="civil_status"
+            value={formData.civil_status}
             label="Civil Status"
             onChange={handleChange}
           >
@@ -72,6 +82,15 @@ const PersonalDetailForm = ({ formData, handleChange }) => {
             <MenuItem value="Separated">Separated</MenuItem>
           </Select>
         </FormControl>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          name="citizenship"
+          label="Citizenship"
+          value={formData.citizenship}
+          onChange={handleChange}
+        />
       </Grid>
     </Grid>
   );

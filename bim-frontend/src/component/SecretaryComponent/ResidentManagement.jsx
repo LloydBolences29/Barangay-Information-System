@@ -7,35 +7,89 @@ import StepperComponent from "../StepperComponent";
 import ResidentNamaeInformationForm from "../ResidentNameInformationForm";
 import PersonalDetailForm from "../PersonalDetailForm";
 import AddressInfoForm from "../AddressInfoForm";
+import SnackbarComponent from "../SnackbarComponent";
+import Box from "@mui/material/Box";
 
 const ResidentManagement = () => {
+  const VITE_API_URL = import.meta.env.VITE_API_URL;
   const [searchTerm, setSearchTerm] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [openNewResidentModal, setOpenNewResidentModal] = useState(false);
   const [formData, setFormData] = useState({
     // Step 1 Form
-    firstname: '',
-    middlename: '',
-    lastname: '',
-    extname: 'N/A',
-    
+    firstname: "",
+    middlename: "",
+    lastname: "",
+    name_extension: "N/A",
+    relationship_to_head: "",
+
     // Step 2 Form
-    dob: '',
-    placeOfBirth: '',
-    sex: '',
-    civilStatus: '',
+    dob: "",
+    place_of_birth: "",
+    sex: "",
+    civil_status: "",
+    citizenship: "",
 
     // Step 3 Form
-    profession: '',
-    houseNumber: '',
-    streetName: '',
-    fullAddress: '',
+    occupation: "",
+    house_no: "",
+    street: "",
+    address: "",
   });
+  const [pageStatus, setPageStatus] = useState("idle");
+  const [successSnackBarStatus, setSuccessSnackBarStatus] = useState(false);
+  const [failedSnackBarStatus, setFailedSnackBarStatus] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+
+  const handleSnackBarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSuccessSnackBarState(false);
+    setFailedSnackBarState(false);
+  };
+
+  //function to submit the form
+  const handleSubmitForm = async () => {
+    try {
+      const response = await fetch(
+        `${VITE_API_URL}/api/residents/add-resident`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      console.log("Form data submitted:", formData);
+
+      const data = await response.json();
+      console.log("Response from server:", data);
+      if (response.ok) {
+        setPageStatus("success");
+        setNotificationMessage("Resident added successfully!");
+        setSuccessSnackBarStatus(true);
+        setOpenNewResidentModal(false);
+      } else {
+        setPageStatus("error");
+        setNotificationMessage(data.message || "Failed to add resident.");
+        setFailedSnackBarStatus(true);
+      }
+    } catch (error) {
+      console.error("Error submitting form data:", error);
+      setPageStatus("error");
+      setNotificationMessage(error.message);
+      setFailedSnackBarStatus(true);
+      setOpenNewResidentModal(false);
+    }
+  };
 
   // Helper function to update the state
   const handleFormChange = (event) => {
     const { name, value } = event.target;
-    setFormData(prevData => ({
+    setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
@@ -60,19 +114,31 @@ const ResidentManagement = () => {
     console.log("Searching for resident with term:", term);
   };
 
-const steps = [
+  const steps = [
     {
-      label: 'Resident Name',
-      description: <ResidentNamaeInformationForm formData={formData} handleChange={handleFormChange} />,
+      label: "Resident Name",
+      description: (
+        <ResidentNamaeInformationForm
+          formData={formData}
+          handleChange={handleFormChange}
+        />
+      ),
     },
     {
-      label: 'Personal Details',
-      description: <PersonalDetailForm formData={formData} handleChange={handleFormChange} />,
+      label: "Personal Details",
+      description: (
+        <PersonalDetailForm
+          formData={formData}
+          handleChange={handleFormChange}
+        />
+      ),
     },
     {
-      label: 'Residence & Profession',
-      description: <AddressInfoForm formData={formData} handleChange={handleFormChange} />,
-    }
+      label: "Residence & Profession",
+      description: (
+        <AddressInfoForm formData={formData} handleChange={handleFormChange} />
+      ),
+    },
   ];
   return (
     <>
@@ -155,95 +221,21 @@ const steps = [
       {openNewResidentModal && (
         <ModalComponent
           modalTitle="Add New Resident"
-          modalSize="lg"
+          modalSize="xl"
           modalShow={openNewResidentModal}
           onHide={() => setOpenNewResidentModal(false)}
         >
-          {/* <div>
-            <div id="header-content">
-              <div id="header-title">
-                <h5>Individual Record of Barangay Inhabitant</h5>
-              </div>
-
-              <div id="prefilled-content">
-                <div id="prefilled-left">
-                  <p>Region: </p>
-                  <p>Province: </p>
-                </div>
-                <div id="prefilled-right">
-                  <p>City/Mun: </p>
-                  <p>Barangay: </p>
-                </div>
-              </div>
-            </div>
-            <Form>
-              <Form.Group className="mb-3" controlId="formResidentName">
-                <Row>
-                  <Row>
-                    <Form.Label>Resident Name</Form.Label>
-                  </Row>
-
-                  <Col>
-                    <Form.Group controlId="formFirstname">
-                      <Form.Label size="sm">
-                        Firstname <span className="text-danger">*</span>
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Enter resident firstname"
-                        required
-                      />
-                    </Form.Group>
-                  </Col>
-
-                  <Col>
-                    <Form.Group controlId="formMiddlename">
-                      <Form.Label size="sm">
-                        Middle name <span className="text-danger">*</span>
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Enter resident middlename"
-                        required
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col>
-                    <Form.Group controlId="formLastname">
-                      <Form.Label size="sm">
-                        Lastname <span className="text-danger">*</span>
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Enter resident lastname"
-                        required
-                      />
-                    </Form.Group>
-                  </Col>
-
-                  <Col>
-                    <Form.Group controlId="formExtname">
-                      <Form.Label size="sm">Extension (Optional) </Form.Label>
-                      <Form.Select>
-                        <option value="N/A">None</option>
-                        <option value="Jr.">Jr.</option>
-                        <option value="Sr.">Sr.</option>
-                        <option value="II">II</option>
-                        <option value="III">III</option>
-                        <option value="IV">IV</option>
-                      </Form.Select>
-                    </Form.Group>
-                  </Col>
-                </Row>
-              </Form.Group>
-            </Form>
-          </div> */}
-          
-          <StepperComponent steps={steps}/>
+          <StepperComponent steps={steps} onFinalSubmit={handleSubmitForm} />
         </ModalComponent>
       )}
+      {/* Snackbar */}
+      <SnackbarComponent
+        pageState={pageStatus}
+        notification={notificationMessage}
+        successSnackBarState={successSnackBarStatus}
+        failedSnackBarState={failedSnackBarStatus}
+        handleClose={handleSnackBarClose}
+      />
     </>
   );
 };

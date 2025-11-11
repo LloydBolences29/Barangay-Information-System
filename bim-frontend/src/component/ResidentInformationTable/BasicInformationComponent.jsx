@@ -1,11 +1,19 @@
-import { useState } from 'react'
+import { useState } from "react";
+import { BsSearch } from "react-icons/bs";
 
 const BasicInformationComponent = () => {
   return (
     <>
-      <h1>This is the basic information component</h1>
+      <div id="basic-info-container">
+        <div id="basic-info-wrapper">
+          <div id="search-icon">
+            <BsSearch />
+          </div>
+          <div id="search-paragraph"><p>Search for resident's name.</p></div>
+        </div>
+      </div>
     </>
-  )
-}
+  );
+};
 
-export default BasicInformationComponent
+export default BasicInformationComponent;
