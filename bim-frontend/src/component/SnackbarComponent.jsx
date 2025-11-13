@@ -5,7 +5,7 @@ const SnackbarComponent = ({pageState, successSnackBarState, handleClose, notifi
 
     return (
     <>
-      {pageState === `${pageState}` ? (
+      {pageState === "success" ? (
         <Snackbar
           open={successSnackBarState}
           autoHideDuration={5000}

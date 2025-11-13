@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { AuthProvider } from "./utils/AuthProvider.jsx";
 import ProtectedRoutes from "./utils/ProtectedRoutes.jsx";
+import { ResidentProvider } from "./utils/ResidentContext.jsx";
 
 function App() {
   const LoginForm = lazy(() => import("./pages/Login.jsx"));
@@ -14,6 +15,7 @@ function App() {
   return (
     <>
       <AuthProvider>
+        <ResidentProvider>
         <Suspense fallback={<div>Loading...</div>}>
           <Routes>
             <Route path="/" element={<LoginForm />} />
@@ -27,6 +29,7 @@ function App() {
             </Route>
           </Routes>
         </Suspense>
+        </ResidentProvider>
       </AuthProvider>
     </>
   );

@@ -19,7 +19,7 @@ router.post("/add-resident", async (req, res) => {
       house_no,
       street,
       address,
-      relationship_to_head
+      relationship_to_head,
     } = req.body;
 
     //CHECKING IF THE BODY HAS AN NAME EXTENSION
@@ -111,13 +111,58 @@ router.post("/add-resident", async (req, res) => {
       citizenship,
       occupationStatus,
       householdId,
-      relationship_to_head
+      relationship_to_head,
     ]);
 
     return res.status(201).json({ message: "Resident added successfully." });
   } catch (error) {
     console.error("Error adding resident.", error);
     return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+//search resident by name or last name
+router.get("/search-resident/:searchterm", async (req, res) => {
+  try {
+    const { searchterm } = req.params;
+    const db = await connectToDatabase();
+
+    const searchSql = `SELECT 
+      resident_info.id,
+      resident_info.lastname,
+      resident_info.firstname,
+      resident_info.middlename,
+      resident_info.name_extension,
+      DATE_FORMAT(resident_info.dob, '%Y-%m-%d') AS dob,
+      resident_info.place_of_birth,
+      resident_info.sex,
+      resident_info.civil_status,
+      resident_info.citizenship,
+      resident_info.occupation,
+      resident_info.relationship_to_head,
+      households.id as HouseHoldID,
+      households.household_number,
+      address.house_no,
+      address.street,
+      address.address,
+      DATE_FORMAT(households.date_registered, '%Y-%m-%d') AS date_registered
+      FROM resident_info
+      JOIN households ON resident_info.householdId = households.id
+      JOIN address ON households.addressID = address.id
+      WHERE firstname LIKE ? OR lastname LIKE ?`;
+    const [results] = await db.execute(searchSql, [searchterm, searchterm]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "No residents found." });
+    }
+    return res
+      .status(200)
+      .json({ message: "Successfully fetched patient.", residents: results });
+  } catch (error) {
+    console.log("Error searching resident.", error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error. Please Check your console" });
   }
 });
 

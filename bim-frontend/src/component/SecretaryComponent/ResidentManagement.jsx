@@ -8,7 +8,7 @@ import ResidentNamaeInformationForm from "../ResidentNameInformationForm";
 import PersonalDetailForm from "../PersonalDetailForm";
 import AddressInfoForm from "../AddressInfoForm";
 import SnackbarComponent from "../SnackbarComponent";
-import Box from "@mui/material/Box";
+import { useResident } from "../../utils/ResidentContext";
 
 const ResidentManagement = () => {
   const VITE_API_URL = import.meta.env.VITE_API_URL;
@@ -40,13 +40,11 @@ const ResidentManagement = () => {
   const [successSnackBarStatus, setSuccessSnackBarStatus] = useState(false);
   const [failedSnackBarStatus, setFailedSnackBarStatus] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
+  const { setResidents } = useResident();
 
   const handleSnackBarClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setSuccessSnackBarState(false);
-    setFailedSnackBarState(false);
+    setSuccessSnackBarStatus(false);
+    setFailedSnackBarStatus(false);
   };
 
   //function to submit the form
@@ -111,7 +109,24 @@ const ResidentManagement = () => {
   };
 
   const handleSearchResident = async (term) => {
-    console.log("Searching for resident with term:", term);
+    try {
+      const response = await fetch(`${VITE_API_URL}/api/residents/search-resident/${term}`)
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Search Results:", data.residents);
+        setResidents(data.residents);
+        setPageStatus("success");
+        setNotificationMessage("Residents fetched successfully!");
+        setSuccessSnackBarStatus(true);
+      }
+      
+    } catch (error) {
+      console.log("Error searching resident:", error);
+      setPageStatus("error");
+      setNotificationMessage(error.message);
+      setFailedSnackBarStatus(true);
+    }
   };
 
   const steps = [
