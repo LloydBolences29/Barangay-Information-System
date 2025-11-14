@@ -7,7 +7,7 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-const ResidentNamaeInformationForm = ({ formData, handleChange }) => {
+const ResidentNamaeInformationForm = ({ formData, handleChange, typeofForm }) => {
   return (
     <Grid container spacing={2}>
       {/* Row 1 */}
@@ -76,13 +76,33 @@ const ResidentNamaeInformationForm = ({ formData, handleChange }) => {
           <InputLabel id="relationship_to_head-label">
             Relationship to Head
           </InputLabel>
+          {typeofForm === "new-resident" && (
+            <>
           <Select
             fullWidth
             labelId="relationship_to_head-label"
             name="relationship_to_head"
             value={formData.relationship_to_head}
             label="Relationship to Head"
+            readOnly
+            disabled
+           
+          >
+            <MenuItem value="Head">Head</MenuItem>
+          </Select>
+          {/**Add a warning text that since you are adding a new resident, the relationship to head is automatically set to "Head" and cannot be changed. */}
+          <p style={{color: 'red', fontSize: '14px', marginTop: '5px'}}>Since you are adding a new resident, the relationship to head is automatically set to "Head" and cannot be changed.</p>
+          </>
+          )}
+          {typeofForm === "existing-resident" && (
+            <Select
+            fullWidth
+            labelId="relationship_to_head-label"
+            name="relationship_to_head"
+            value={formData.relationship_to_head}
+            label="Relationship to Head"
             onChange={handleChange}
+           
           >
             <MenuItem value="Head">Head</MenuItem>
             <MenuItem value="Spouse">Spouse</MenuItem>
@@ -94,6 +114,7 @@ const ResidentNamaeInformationForm = ({ formData, handleChange }) => {
             <MenuItem value="Other Relative">Other Relative</MenuItem>
             <MenuItem value="Non-Relative">Non-Relative</MenuItem>
           </Select>
+          )}
         </FormControl>
       </Grid>
     </Grid>

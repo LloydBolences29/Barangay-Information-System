@@ -44,6 +44,7 @@ const ResidentManagement = () => {
   const [pageStatus, setPageStatus] = useState("idle");
   const [successSnackBarStatus, setSuccessSnackBarStatus] = useState(false);
   const [failedSnackBarStatus, setFailedSnackBarStatus] = useState(false);
+  const [formType, setFormType] = useState("");
   const [notificationMessage, setNotificationMessage] = useState("");
   const { setResidents } = useResident();
 
@@ -106,7 +107,27 @@ const ResidentManagement = () => {
     setOpenModal(false);
   };
 
-  const handleNewResidentModalOpen = () => {
+// In ResidentManagement.jsx
+
+  const handleNewResidentModalOpen = (type) => {
+    setFormType(type); 
+
+
+    // update the formData state here
+    if (type === "new-resident") {
+      setFormData((prevData) => ({
+        ...prevData,
+        relationship_to_head: "Head" 
+      }));
+    } else {
+      // If they click "existing-resident", reset it to empty
+      setFormData((prevData) => ({
+        ...prevData,
+        relationship_to_head: "" // Clear the value so they can choose
+      }));
+    }
+    // --- END OF FIX ---
+
     setOpenModal(false);
     setTimeout(() => {
       setOpenNewResidentModal(true);
@@ -143,6 +164,7 @@ const ResidentManagement = () => {
           <ResidentNameInformationForm
             formData={formData}
             handleChange={handleFormChange}
+            typeofForm={formType}
           />
         </Suspense>
       ),
@@ -234,7 +256,7 @@ const ResidentManagement = () => {
               <Button
                 variant="outline-secondary"
                 size="sm"
-                onClick={handleNewResidentModalOpen}
+                onClick={() => handleNewResidentModalOpen("new-resident")}
               >
                 Add New
               </Button>
