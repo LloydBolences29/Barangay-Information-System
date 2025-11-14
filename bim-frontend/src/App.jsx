@@ -16,19 +16,19 @@ function App() {
     <>
       <AuthProvider>
         <ResidentProvider>
-        <Suspense fallback={<div>Loading...</div>}>
-          <Routes>
-            <Route path="/" element={<LoginForm />} />
+          <Suspense fallback={<div>Loading...</div>}>
+            <Routes>
+              <Route path="/" element={<LoginForm />} />
 
-            <Route element={<ProtectedRoutes allowedRoles={["admin"]} />}>
-              <Route path="/user-management" element={<UserManagement />} />
-              <Route path="/admin" element={<AdminPage />} />
-            </Route>
-            <Route element={<ProtectedRoutes allowedRoles={["secretary"]} />}>
-              <Route path="/secretary" element={<SecretaryPage />} />
-            </Route>
-          </Routes>
-        </Suspense>
+              <Route element={<ProtectedRoutes allowedRoles={["admin"]} />}>
+                <Route path="/user-management" element={<UserManagement />} />
+                <Route path="/admin" element={<AdminPage />} />
+              </Route>
+              <Route element={<ProtectedRoutes allowedRoles={["secretary"]} />}>
+                <Route path="/secretary" element={<SecretaryPage />} />
+              </Route>
+            </Routes>
+          </Suspense>
         </ResidentProvider>
       </AuthProvider>
     </>

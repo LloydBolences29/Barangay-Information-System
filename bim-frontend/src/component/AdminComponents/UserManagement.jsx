@@ -51,7 +51,7 @@ const UserManagement = () => {
     <div>
       <Container id="register-main-container">
         <div id="welcome-header-text">
-          <h1>Welcome to Barangay Information Management System</h1>
+          <h1>Welcome to Your System</h1>
         </div>
 
         <div id="register-container">
