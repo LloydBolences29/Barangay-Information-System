@@ -1,14 +1,19 @@
-import { useState } from "react";
-import ResidentInformationTable from "../ResidentInformationTable/ResidentInformationTable";
+import { useState, Suspense, lazy } from "react";
 import "./ResidentManagement.css";
 import { Button, Modal, Form, Row, Col } from "react-bootstrap";
 import ModalComponent from "../../component/ModalComponent";
 import StepperComponent from "../StepperComponent";
-import ResidentNamaeInformationForm from "../ResidentNameInformationForm";
-import PersonalDetailForm from "../PersonalDetailForm";
-import AddressInfoForm from "../AddressInfoForm";
+
 import SnackbarComponent from "../SnackbarComponent";
 import { useResident } from "../../utils/ResidentContext";
+
+
+const ResidentNameInformationForm = lazy(() =>
+  import("../ResidentNameInformationForm")
+);
+const PersonalDetailForm = lazy(() => import("../PersonalDetailForm"));
+const AddressInfoForm = lazy(() => import("../AddressInfoForm"));
+const ResidentInformationTable = lazy (() => import("../ResidentInformationTable/ResidentInformationTable"))
 
 const ResidentManagement = () => {
   const VITE_API_URL = import.meta.env.VITE_API_URL;
@@ -110,7 +115,9 @@ const ResidentManagement = () => {
 
   const handleSearchResident = async (term) => {
     try {
-      const response = await fetch(`${VITE_API_URL}/api/residents/search-resident/${term}`)
+      const response = await fetch(
+        `${VITE_API_URL}/api/residents/search-resident/${term}`
+      );
 
       const data = await response.json();
       if (response.ok) {
@@ -120,7 +127,6 @@ const ResidentManagement = () => {
         setNotificationMessage("Residents fetched successfully!");
         setSuccessSnackBarStatus(true);
       }
-      
     } catch (error) {
       console.log("Error searching resident:", error);
       setPageStatus("error");
@@ -133,25 +139,34 @@ const ResidentManagement = () => {
     {
       label: "Resident Name",
       description: (
-        <ResidentNamaeInformationForm
-          formData={formData}
-          handleChange={handleFormChange}
-        />
+        <Suspense fallback={<div>Loading...</div>}>
+          <ResidentNameInformationForm
+            formData={formData}
+            handleChange={handleFormChange}
+          />
+        </Suspense>
       ),
     },
     {
       label: "Personal Details",
       description: (
-        <PersonalDetailForm
-          formData={formData}
-          handleChange={handleFormChange}
-        />
+        <Suspense fallback={<div>Loading...</div>}>
+          <PersonalDetailForm
+            formData={formData}
+            handleChange={handleFormChange}
+          />
+        </Suspense>
       ),
     },
     {
       label: "Residence & Profession",
       description: (
-        <AddressInfoForm formData={formData} handleChange={handleFormChange} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <AddressInfoForm
+            formData={formData}
+            handleChange={handleFormChange}
+          />
+        </Suspense>
       ),
     },
   ];
@@ -159,7 +174,7 @@ const ResidentManagement = () => {
     <>
       <div id="ris-body">
         <div id="header-title">
-          <h1>Resident Information System</h1>
+          <h1> System</h1>
         </div>
 
         <div className="container">
@@ -192,8 +207,11 @@ const ResidentManagement = () => {
                 </Button>
               </div>
             </div>
+            <Suspense fallback={<div>Loading...</div>}>
             <ResidentInformationTable />
+            </Suspense>
           </div>
+
         </div>
       </div>
 

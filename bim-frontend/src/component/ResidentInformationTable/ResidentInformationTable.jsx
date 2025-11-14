@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Suspense, useState, lazy } from "react";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
@@ -7,8 +7,13 @@ import TabPanel from "@mui/lab/TabPanel";
 import { Typography } from "@mui/material";
 
 // Import your two components
-import BasicInformationComponent from "../ResidentInformationTable/BasicInformationComponent";
-import SearchListComponent from "../SearchListComponent"; 
+const BasicInformationComponent = lazy(() =>
+  import("../ResidentInformationTable/BasicInformationComponent")
+);
+const SearchListComponent = lazy(() => import("../SearchListComponent"));
+const HouseholdComponent = lazy(() =>
+  import("../ResidentHousehold/HouseholdComponent")
+);
 
 // Import the context (but you don't need to use it here if SearchList gets it)
 // We'll let SearchListComponent get its own data.
@@ -42,28 +47,32 @@ const ResidentInformationTable = () => {
 
         <TabPanel value="1">
           {selectedResident ? (
-            <BasicInformationComponent
-              selectedResident={selectedResident}
-              onBackClick={handleBackClick}
-            />
+            <Suspense fallback={<div>Loading...</div>}>
+              <BasicInformationComponent
+                selectedResident={selectedResident}
+                onBackClick={handleBackClick}
+              />
+            </Suspense>
           ) : (
             // Pass the "onSelectResident" function as a prop
-            <SearchListComponent
-              onSelectResident={handleSelectResident}
-            />
+            <Suspense fallback={<div>Loading...</div>}>
+              <SearchListComponent onSelectResident={handleSelectResident} />
+            </Suspense>
           )}
         </TabPanel>
 
         <TabPanel value="2">
           {selectedResident ? (
-            <Typography>Household Info for: {selectedResident.firstname}</Typography>
+            <Suspense fallback={<div>Loading...</div>}>
+              <HouseholdComponent selectedRes={selectedResident} />
+            </Suspense>
           ) : (
             <Typography>Please search and select a resident first.</Typography>
           )}
         </TabPanel>
-          <TabPanel value="3">Item Three</TabPanel>
-        </TabContext>
-      </Box>
+        <TabPanel value="3">Item Three</TabPanel>
+      </TabContext>
+    </Box>
   );
 };
 

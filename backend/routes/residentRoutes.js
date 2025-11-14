@@ -166,4 +166,45 @@ router.get("/search-resident/:searchterm", async (req, res) => {
   }
 });
 
+//fetching all the members of a certain household
+router.get("/get-household-members/:id", async (req, res) =>{
+  try {
+    const { id } = req.params;
+    const db =  await connectToDatabase();
+
+    const sql  = `SELECT 
+    r.id,
+    r.firstname, 
+    r.lastname, 
+    r.relationship_to_head,
+    a.street,
+    a.house_no,
+    h.id AS householdId
+  FROM 
+    resident_info AS r
+  JOIN 
+    households AS h ON r.householdId = h.id
+  JOIN 
+    address AS a ON h.addressId = a.id
+  WHERE 
+    r.householdId = (
+      SELECT householdId 
+      FROM resident_info 
+      WHERE id = ?
+    )`;
+
+    const [results] = await db.execute(sql, [id]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "No household members found." });
+    }
+    return res.status(200).json({ message: "Successfully fetched household members.", members: results });
+  } catch (error) {
+    console.log("Error fetching household members:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error. Please Check your console" });
+  }
+})
+
 module.exports = router;
