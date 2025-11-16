@@ -167,12 +167,12 @@ router.get("/search-resident/:searchterm", async (req, res) => {
 });
 
 //fetching all the members of a certain household
-router.get("/get-household-members/:id", async (req, res) =>{
+router.get("/get-household-members/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const db =  await connectToDatabase();
+    const db = await connectToDatabase();
 
-    const sql  = `SELECT 
+    const sql = `SELECT 
     r.id,
     r.firstname, 
     r.lastname, 
@@ -198,13 +198,81 @@ router.get("/get-household-members/:id", async (req, res) =>{
     if (results.length === 0) {
       return res.status(404).json({ message: "No household members found." });
     }
-    return res.status(200).json({ message: "Successfully fetched household members.", members: results });
+    return res.status(200).json({
+      message: "Successfully fetched household members.",
+      members: results,
+    });
   } catch (error) {
     console.log("Error fetching household members:", error);
     return res
       .status(500)
       .json({ message: "Internal server error. Please Check your console" });
   }
-})
+});
+
+//update resident info
+router.patch("/update-resident/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      lastname,
+      firstname,
+      middlename,
+      name_extension,
+      dob,
+      place_of_birth,
+      civil_status,
+      citizenship,
+      occupation,
+    } = req.body;
+
+    const db = await connectToDatabase();
+
+    //check if resident exists
+    const checkSql = `SELECT * FROM resident_info WHERE id = ?`;
+    const [existingResidents] = await db.execute(checkSql, [id]);
+
+    if (existingResidents.length === 0) {
+      return res.status(404).json({ message: "Resident not found." });
+    }
+
+    const sql = `
+    UPDATE resident_info 
+    SET 
+      lastname = ?, 
+      firstname = ?, 
+      middlename = ?, 
+      name_extension = ?, 
+      dob = ?, 
+      place_of_birth = ?, 
+      civil_status = ?, 
+      citizenship = ?, 
+      occupation = ?
+    WHERE 
+      id = ?`;
+
+    const [result] = await db.execute(sql, [
+      lastname,
+      firstname,
+      middlename,
+      name_extension,
+      dob,
+      place_of_birth,
+      civil_status,
+      citizenship,
+      occupation,
+      id,
+    ]);
+
+    return res
+      .status(200)
+      .json({ message: "Resident information updated successfully." });
+  } catch (error) {
+    console.log("Error updating resident info:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error. Please Check your console" });
+  }
+});
 
 module.exports = router;

@@ -34,6 +34,10 @@ const ResidentInformationTable = () => {
     setSelectedResident(null);
   };
 
+  const handleUpdateSuccess = (updatedData) => {
+  setSelectedResident(updatedData); 
+};
+
   return (
     <Box sx={{ width: "100%", typography: "body1" }}>
       <TabContext value={tabValue}>
@@ -51,6 +55,7 @@ const ResidentInformationTable = () => {
               <BasicInformationComponent
                 selectedResident={selectedResident}
                 onBackClick={handleBackClick}
+                onUpdateSuccess={handleUpdateSuccess}
               />
             </Suspense>
           ) : (

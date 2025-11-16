@@ -1,0 +1,12 @@
+.button-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.right-button-actions{
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
