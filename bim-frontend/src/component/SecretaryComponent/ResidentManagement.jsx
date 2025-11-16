@@ -7,13 +7,17 @@ import StepperComponent from "../StepperComponent";
 import SnackbarComponent from "../SnackbarComponent";
 import { useResident } from "../../utils/ResidentContext";
 
-
 const ResidentNameInformationForm = lazy(() =>
   import("../ResidentNameInformationForm")
 );
 const PersonalDetailForm = lazy(() => import("../PersonalDetailForm"));
 const AddressInfoForm = lazy(() => import("../AddressInfoForm"));
-const ResidentInformationTable = lazy (() => import("../ResidentInformationTable/ResidentInformationTable"))
+const ResidentInformationTable = lazy(() =>
+  import("../ResidentInformationTable/ResidentInformationTable")
+);
+const SearchForHousehold = lazy(() =>
+  import("../ExistingResidentComponent/SearchForHousehold")
+);
 
 const ResidentManagement = () => {
   const VITE_API_URL = import.meta.env.VITE_API_URL;
@@ -53,6 +57,18 @@ const ResidentManagement = () => {
     setFailedSnackBarStatus(false);
   };
 
+  const handleHouseholdSelect = (householdId) => {
+    // Update the formData state with the selected householdId
+    setFormData((prevData) => ({
+      ...prevData,
+      household_id: householdId,
+    }));
+  }
+
+
+  //having an error in submitting a form for existing resident
+  // debug this becuase when i submit one form from existing resident it creates a new household
+  //not getting the household id from the selected household
   //function to submit the form
   const handleSubmitForm = async () => {
     try {
@@ -107,27 +123,34 @@ const ResidentManagement = () => {
     setOpenModal(false);
   };
 
-// In ResidentManagement.jsx
+  // In ResidentManagement.jsx
 
   const handleNewResidentModalOpen = (type) => {
-    setFormType(type); 
-
+    setFormType(type);
 
     // update the formData state here
     if (type === "new-resident") {
       setFormData((prevData) => ({
         ...prevData,
-        relationship_to_head: "Head" 
+        relationship_to_head: "Head",
       }));
     } else {
       // If they click "existing-resident", reset it to empty
       setFormData((prevData) => ({
         ...prevData,
-        relationship_to_head: "" // Clear the value so they can choose
+        relationship_to_head: "", // Clear the value so they can choose
       }));
     }
     // --- END OF FIX ---
 
+    setOpenModal(false);
+    setTimeout(() => {
+      setOpenNewResidentModal(true);
+    }, 500);
+  };
+
+  const handleAddToExistingHouseholdModal = () => {
+    setFormType("existing-resident");
     setOpenModal(false);
     setTimeout(() => {
       setOpenNewResidentModal(true);
@@ -156,42 +179,64 @@ const ResidentManagement = () => {
     }
   };
 
-  const steps = [
-    {
-      label: "Resident Name",
-      description: (
-        <Suspense fallback={<div>Loading...</div>}>
-          <ResidentNameInformationForm
-            formData={formData}
-            handleChange={handleFormChange}
-            typeofForm={formType}
-          />
-        </Suspense>
-      ),
-    },
-    {
-      label: "Personal Details",
-      description: (
-        <Suspense fallback={<div>Loading...</div>}>
-          <PersonalDetailForm
-            formData={formData}
-            handleChange={handleFormChange}
-          />
-        </Suspense>
-      ),
-    },
-    {
-      label: "Residence & Profession",
-      description: (
-        <Suspense fallback={<div>Loading...</div>}>
-          <AddressInfoForm
-            formData={formData}
-            handleChange={handleFormChange}
-          />
-        </Suspense>
-      ),
-    },
-  ];
+  //for exisiting resident
+  const SearchForHouseholdStep = {
+    label: "Search Household",
+    description: (
+      <Suspense fallback={<div>Loading...</div>}>
+        <SearchForHousehold 
+          onHouseholdSelect={handleHouseholdSelect}
+        />
+      </Suspense>
+    ),
+  }
+
+  const ResidentNameStep = {
+    label: "Resident Name",
+    description: (
+      <Suspense fallback={<div>Loading...</div>}>
+        <ResidentNameInformationForm
+          formData={formData}
+          handleChange={handleFormChange}
+          typeofForm={formType}
+        />
+      </Suspense>
+    ),
+  };
+
+  const PersonalDetailsStep = {
+    label: "Personal Details",
+    description: (
+      <Suspense fallback={<div>Loading...</div>}>
+        <PersonalDetailForm
+          formData={formData}
+          handleChange={handleFormChange}
+        />
+      </Suspense>
+    ),
+  };
+
+  const AddressProfessionStep = {
+    label: "Residence & Profession",
+    description: (
+      <Suspense fallback={<div>Loading...</div>}>
+        <AddressInfoForm
+          formData={formData}
+          handleChange={handleFormChange}
+        />
+      </Suspense>
+    ),
+  };
+
+  let steps = [];
+
+  if (formType === "existing-resident") {
+    steps.push(SearchForHouseholdStep);
+  }
+
+  steps.push(ResidentNameStep);
+  steps.push(PersonalDetailsStep);
+  steps.push(AddressProfessionStep);
   return (
     <>
       <div id="ris-body">
@@ -230,10 +275,9 @@ const ResidentManagement = () => {
               </div>
             </div>
             <Suspense fallback={<div>Loading...</div>}>
-            <ResidentInformationTable />
+              <ResidentInformationTable />
             </Suspense>
           </div>
-
         </div>
       </div>
 
@@ -260,7 +304,13 @@ const ResidentManagement = () => {
               >
                 Add New
               </Button>
-              <Button variant="outline-secondary" size="sm">
+              <Button
+                variant="outline-secondary"
+                size="sm"
+                onClick={() =>
+                  handleAddToExistingHouseholdModal("existing-resident")
+                }
+              >
                 Add To Existing One
               </Button>
             </div>

@@ -275,4 +275,44 @@ router.patch("/update-resident/:id", async (req, res) => {
   }
 });
 
+//search for households by head of household's last name
+router.get("/household-search/:searchterm", async (req, res) => {
+  try {
+    const { searchterm } = req.params;
+    const db = await connectToDatabase();
+
+    const searchSql = `SELECT 
+      h.id AS householdId,
+      h.household_number,
+      a.house_no,
+      a.street,
+      a.address,
+      r.firstname AS head_firstname,
+      r.lastname AS head_lastname
+    FROM
+      households AS h
+    JOIN
+      address AS a ON h.addressID = a.id
+    JOIN
+      resident_info AS r ON h.id = r.householdId
+    WHERE
+      r.relationship_to_head = 'Head'
+      AND r.lastname LIKE ?`;
+    const [results] = await db.execute(searchSql, [`%${searchterm}%`]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "No households found." });
+    }
+    return res
+      .status(200)
+      .json({ message: "Successfully fetched households.", households: results });
+    
+  } catch (error) {
+    console.log("Error searching households:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error. Please Check your console" });
+  }
+})
+
 module.exports = router;
