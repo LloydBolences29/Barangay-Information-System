@@ -137,6 +137,7 @@ router.post("/add-resident-existing-household", async (req, res) => {
       occupation,
       household_id,
       relationship_to_head,
+      resident_status = "active",
     } = req.body;
 
     //check if the user provided the householdId
@@ -174,8 +175,8 @@ router.post("/add-resident-existing-household", async (req, res) => {
 
     const sql =
       `INSERT INTO resident_info 
-    (firstname, lastname, middlename, name_extension, dob, place_of_birth, sex, civil_status, citizenship, occupation, householdId, relationship_to_head) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    (firstname, lastname, middlename, name_extension, dob, place_of_birth, sex, civil_status, citizenship, occupation, householdId, relationship_to_head, resident_status) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     await db.execute(sql, [
       firstname,
@@ -190,6 +191,7 @@ router.post("/add-resident-existing-household", async (req, res) => {
       occupation,
       household_id,
       relationship_to_head,
+      resident_status,
     ]);
     return res.status(200).json({ message: "Resident added successfully." });
   } catch (error) {
@@ -219,6 +221,7 @@ router.get("/search-resident/:searchterm", async (req, res) => {
       resident_info.citizenship,
       resident_info.occupation,
       resident_info.relationship_to_head,
+      resident_info.resident_status,
       households.id as HouseHoldID,
       households.household_number,
       address.house_no,

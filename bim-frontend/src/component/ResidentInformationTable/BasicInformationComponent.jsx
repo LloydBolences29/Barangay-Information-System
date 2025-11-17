@@ -7,8 +7,11 @@ import { AiOutlineEdit } from "react-icons/ai";
 import ModalComponent from "../ModalComponent";
 import SnackbarComponent from "../SnackbarComponent";
 
-
-const BasicInformationComponent = ({ selectedResident, onBackClick, onUpdateSuccess }) => {
+const BasicInformationComponent = ({
+  selectedResident,
+  onBackClick,
+  onUpdateSuccess,
+}) => {
   const VITE_API_URL = import.meta.env.VITE_API_URL;
   const [pageStatus, setPageStatus] = useState("idle");
   const [successSnackBarStatus, setSuccessSnackBarStatus] = useState(false);
@@ -26,9 +29,9 @@ const BasicInformationComponent = ({ selectedResident, onBackClick, onUpdateSucc
     civil_status: selectedResident.civil_status || "",
     citizenship: selectedResident.citizenship || "",
     occupation: selectedResident.occupation || "",
+    resident_status: selectedResident.resident_status || "",
   });
 
-  console.log("Selected Resident:", selectedResident);
 
   const handleSnackBarClose = (event, reason) => {
     setSuccessSnackBarStatus(false);
@@ -41,14 +44,17 @@ const BasicInformationComponent = ({ selectedResident, onBackClick, onUpdateSucc
 
   const handleUpdateResidentInfo = async () => {
     try {
-      const response = await fetch(`${VITE_API_URL}/api/residents/update-resident/${selectedResident.id}`, {
-        method: "PATCH",
-        withfCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedResidentData),
-      });
+      const response = await fetch(
+        `${VITE_API_URL}/api/residents/update-resident/${selectedResident.id}`,
+        {
+          method: "PATCH",
+          withfCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedResidentData),
+        }
+      );
 
       const data = await response.json();
       if (response.ok) {
@@ -58,8 +64,6 @@ const BasicInformationComponent = ({ selectedResident, onBackClick, onUpdateSucc
         setOpenEditResidentModal(false);
         onUpdateSuccess(updatedResidentData);
       }
-
-    
     } catch (error) {
       console.log("Error updating resident info:", error);
       setPageStatus("error");
@@ -79,6 +83,9 @@ const BasicInformationComponent = ({ selectedResident, onBackClick, onUpdateSucc
     },
   ];
 
+  console.log("Selected Resident:", updatedResidentData);
+
+
   return (
     <div id="basic-info-container">
       <div id="basic-info-wrapper">
@@ -95,9 +102,7 @@ const BasicInformationComponent = ({ selectedResident, onBackClick, onUpdateSucc
                 startIcon={<AiOutlineEdit />}
                 sx={{ mb: 2 }}
                 onClick={handleOpenEditResidentModal}
-                // href={`/edit-resident/${resident._id}`}
               >
-                {" "}
                 Edit
               </Button>
               <Button
@@ -106,9 +111,7 @@ const BasicInformationComponent = ({ selectedResident, onBackClick, onUpdateSucc
                 size="small"
                 startIcon={<AiOutlineEdit />}
                 sx={{ mb: 2 }}
-                // href={`/edit-resident/${resident._id}`}
               >
-                {" "}
                 Delete
               </Button>
             </div>
@@ -340,6 +343,27 @@ const BasicInformationComponent = ({ selectedResident, onBackClick, onUpdateSucc
                             })
                           }
                         />
+                      </Col>
+                      <Col md={6}>
+                        <Form.Label className="fw-bold">
+                          Resident Status:
+                        </Form.Label>
+                        <Form.Select
+                          type="text"
+                          value={updatedResidentData.resident_status}
+                          onChange={(e) =>
+                            setUpdatedResidentData({
+                              ...updatedResidentData,
+                              resident_status: e.target.value,
+                            })
+                          }
+                        >
+                          <option value="">Select Resident Status</option>
+                          <option value="active">Active</option>
+                          <option value="inactive">Inactive</option>
+                          <option value="moved-out">Moved Out</option>
+                          <option value="deceased">Deceased</option>
+                        </Form.Select>
                       </Col>
                     </Row>
                   </div>

@@ -44,6 +44,7 @@ const ResidentManagement = () => {
     house_no: "",
     street: "",
     address: "",
+    resident_status: ""
   });
   const [pageStatus, setPageStatus] = useState("idle");
   const [successSnackBarStatus, setSuccessSnackBarStatus] = useState(false);
@@ -148,7 +149,7 @@ const ResidentManagement = () => {
         relationship_to_head: "", // Clear the value so they can choose
       }));
     }
-    // --- END OF FIX ---
+
 
     setOpenModal(false);
     setTimeout(() => {
