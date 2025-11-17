@@ -71,9 +71,16 @@ const ResidentManagement = () => {
   //not getting the household id from the selected household
   //function to submit the form
   const handleSubmitForm = async () => {
+        let url = "";
+
+    if(formType === "existing-resident"){
+      url = `${VITE_API_URL}/api/residents/add-resident-existing-household`;
+    }else{
+      url = `${VITE_API_URL}/api/residents/add-resident`;
+    }
     try {
       const response = await fetch(
-        `${VITE_API_URL}/api/residents/add-resident`,
+        url,
         {
           method: "POST",
           headers: {
@@ -158,6 +165,7 @@ const ResidentManagement = () => {
   };
 
   const handleSearchResident = async (term) => {
+
     try {
       const response = await fetch(
         `${VITE_API_URL}/api/residents/search-resident/${term}`

@@ -121,6 +121,85 @@ router.post("/add-resident", async (req, res) => {
   }
 });
 
+//add to an existing one
+router.post("/add-resident-existing-household", async (req, res) => {
+  try {
+    const {
+      firstname,
+      lastname,
+      middlename,
+      name_extension,
+      dob,
+      place_of_birth,
+      sex,
+      civil_status,
+      citizenship,
+      occupation,
+      household_id,
+      relationship_to_head,
+    } = req.body;
+
+    //check if the user provided the householdId
+    if (!household_id) {
+      return res.status(400).json({ message: "Please provide a valid household ID." })
+    }
+
+    // Ensure it's a string first
+    let idString = household_id.toString();
+
+    // Remove "HH-" if it's already there to avoid "HH-HH-"
+    if (idString.startsWith("HH-")) {
+      idString = idString.replace("HH-", "");
+    }
+
+    // Pad it with zeros (e.g., "1" becomes "0001")
+    // Then add the prefix
+    const formattedId = `HH-${idString.padStart(4, '0')}`;
+
+    //check if the user provided all the fields
+    if (!firstname ||
+      !lastname ||
+      !middlename ||
+      !dob ||
+      !place_of_birth ||
+      !sex ||
+      !civil_status ||
+      !citizenship ||
+      !relationship_to_head) {
+      return res.status(400).json({ message: "Please provide all required fields." })
+    }
+
+
+    const db = await connectToDatabase();
+
+    const sql =
+      `INSERT INTO resident_info 
+    (firstname, lastname, middlename, name_extension, dob, place_of_birth, sex, civil_status, citizenship, occupation, householdId, relationship_to_head) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+    await db.execute(sql, [
+      firstname,
+      lastname,
+      middlename,
+      name_extension ? name_extension : "N/A",
+      dob,
+      place_of_birth,
+      sex,
+      civil_status,
+      citizenship,
+      occupation,
+      household_id,
+      relationship_to_head,
+    ]);
+    return res.status(200).json({ message: "Resident added successfully." });
+  } catch (error) {
+    console.log("Error adding resident to existing household.", error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error. Please Check your console" });
+  }
+})
+
 //search resident by name or last name
 router.get("/search-resident/:searchterm", async (req, res) => {
   try {
@@ -306,7 +385,7 @@ router.get("/household-search/:searchterm", async (req, res) => {
     return res
       .status(200)
       .json({ message: "Successfully fetched households.", households: results });
-    
+
   } catch (error) {
     console.log("Error searching households:", error);
     return res
