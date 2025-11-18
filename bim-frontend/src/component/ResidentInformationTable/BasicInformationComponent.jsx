@@ -360,7 +360,6 @@ const BasicInformationComponent = ({
                         >
                           <option value="">Select Resident Status</option>
                           <option value="active">Active</option>
-                          <option value="inactive">Inactive</option>
                           <option value="moved-out">Moved Out</option>
                           <option value="deceased">Deceased</option>
                         </Form.Select>

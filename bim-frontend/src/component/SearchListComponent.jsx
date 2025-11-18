@@ -1,21 +1,31 @@
 import React from "react";
 import { useResident } from "../utils/ResidentContext";
 import { Spinner } from "react-bootstrap";
-import { List, ListItem, ListItemButton, ListItemText, Chip } from "@mui/material";
+import { List, ListItem, ListItemButton, ListItemText, Chip, Box, Typography } from "@mui/material";
 import { BsSearch } from "react-icons/bs";
+import { BiErrorCircle } from "react-icons/bi"; // Optional: Icon for error
 
-// It receives "onSelectResident" as a prop
-const SearchListComponent = ({ onSelectResident }) => {
-  const { residents, loading } = useResident(); // Gets data from Context
+const SearchListComponent = ({ onSelectResident, onError }) => {
+  const { residents, loading } = useResident();
 
   return (
     <>
       {loading ? (
+        // 1. PRIORITY: Loading
         <div className="text-center my-4">
           <Spinner animation="border" variant="primary" />
           <p>Loading residents...</p>
         </div>
+      ) : onError ? ( 
+        // 2. PRIORITY: Error Message (Check this BEFORE empty list)
+        <div className="text-center my-4" style={{ color: 'red' }}>
+           <div id="search-icon">
+             <BiErrorCircle size={40} />
+           </div>
+           <p>{onError}</p>
+        </div>
       ) : residents.length === 0 ? (
+        // 3. PRIORITY: Empty State (Default / Start)
         <>
           <div id="search-icon">
             <BsSearch size={40} />
@@ -25,6 +35,7 @@ const SearchListComponent = ({ onSelectResident }) => {
           </div>
         </>
       ) : (
+        // 4. PRIORITY: Show the List
         <List>
           {residents.map((resident) => (
             <ListItem key={resident.id} disablePadding>
@@ -34,12 +45,7 @@ const SearchListComponent = ({ onSelectResident }) => {
                     resident.lastname
                   } ${resident.name_extension === 'N/A' ? "" : resident.name_extension}`}
                 />
-                {/* Add the status chip */}
-                {/* <Chip
-                  label={resident.status}
-                  color={resident.status === "Active" ? "success" : "default"}
-                  size="small"
-                /> */}
+                 {/* <Chip ... /> */}
               </ListItemButton>
             </ListItem>
           ))}

@@ -18,7 +18,7 @@ const HouseholdComponent = lazy(() =>
 // Import the context (but you don't need to use it here if SearchList gets it)
 // We'll let SearchListComponent get its own data.
 
-const ResidentInformationTable = () => {
+const ResidentInformationTable = ({ searchError }) => {
   const [tabValue, setTabValue] = useState("1");
   const [selectedResident, setSelectedResident] = useState(null);
 
@@ -61,7 +61,7 @@ const ResidentInformationTable = () => {
           ) : (
             // Pass the "onSelectResident" function as a prop
             <Suspense fallback={<div>Loading...</div>}>
-              <SearchListComponent onSelectResident={handleSelectResident} />
+              <SearchListComponent onSelectResident={handleSelectResident} onError={searchError} />
             </Suspense>
           )}
         </TabPanel>

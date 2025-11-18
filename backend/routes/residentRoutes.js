@@ -231,7 +231,7 @@ router.get("/search-resident/:searchterm", async (req, res) => {
       FROM resident_info
       JOIN households ON resident_info.householdId = households.id
       JOIN address ON households.addressID = address.id
-      WHERE firstname LIKE ? OR lastname LIKE ?`;
+      WHERE resident_status = "active" AND (firstname LIKE ? OR lastname LIKE ?)`;
     const [results] = await db.execute(searchSql, [searchterm, searchterm]);
 
     if (results.length === 0) {
@@ -306,6 +306,7 @@ router.patch("/update-resident/:id", async (req, res) => {
       civil_status,
       citizenship,
       occupation,
+      resident_status = "active",
     } = req.body;
 
     const db = await connectToDatabase();
@@ -318,6 +319,9 @@ router.patch("/update-resident/:id", async (req, res) => {
       return res.status(404).json({ message: "Resident not found." });
     }
 
+
+
+
     const sql = `
     UPDATE resident_info 
     SET 
@@ -329,11 +333,12 @@ router.patch("/update-resident/:id", async (req, res) => {
       place_of_birth = ?, 
       civil_status = ?, 
       citizenship = ?, 
-      occupation = ?
+      occupation = ?,
+      resident_status = ?
     WHERE 
       id = ?`;
 
-    const [result] = await db.execute(sql, [
+    await db.execute(sql, [
       lastname,
       firstname,
       middlename,
@@ -343,6 +348,7 @@ router.patch("/update-resident/:id", async (req, res) => {
       civil_status,
       citizenship,
       occupation,
+      resident_status,
       id,
     ]);
 

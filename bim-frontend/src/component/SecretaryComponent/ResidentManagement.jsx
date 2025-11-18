@@ -52,7 +52,7 @@ const ResidentManagement = () => {
   const [formType, setFormType] = useState("");
   const [notificationMessage, setNotificationMessage] = useState("");
   const { setResidents } = useResident();
-
+  const [searchErrorMessage, setSearchErrorMessage] = useState("");
   const handleSnackBarClose = (event, reason) => {
     setSuccessSnackBarStatus(false);
     setFailedSnackBarStatus(false);
@@ -179,6 +179,9 @@ const ResidentManagement = () => {
         setPageStatus("success");
         setNotificationMessage("Residents fetched successfully!");
         setSuccessSnackBarStatus(true);
+      }else if (response.status === 404){
+        setResidents([]);
+        setSearchErrorMessage("No residents found.");
       }
     } catch (error) {
       console.log("Error searching resident:", error);
@@ -243,9 +246,29 @@ const ResidentManagement = () => {
     steps.push(SearchForHouseholdStep);
   }
 
+
   steps.push(ResidentNameStep);
   steps.push(PersonalDetailsStep);
   steps.push(AddressProfessionStep);
+
+  const handleSearchInput = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    // 1. Clear the error message immediately when the user types
+    if (searchErrorMessage) {
+      setSearchErrorMessage("");
+      // If you have a separate state for 'searchError', clear that too
+      // setPageStatus("idle"); 
+    }
+
+    // 2. (Optional) If the input is empty, reset everything to default
+    if (value === "") {
+      setResidents([]); // Clear the list
+      setSearchErrorMessage(""); // Ensure error is gone
+      setPageStatus("idle"); // Reset status
+    }
+  };
   return (
     <>
       <div id="ris-body">
@@ -261,7 +284,7 @@ const ResidentManagement = () => {
                   id="search-input"
                   type="text"
                   placeholder="Search Resident..."
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={handleSearchInput}
                 />
                 <Button
                   variant="outline-primary"
@@ -284,7 +307,7 @@ const ResidentManagement = () => {
               </div>
             </div>
             <Suspense fallback={<div>Loading...</div>}>
-              <ResidentInformationTable />
+              <ResidentInformationTable searchError={searchErrorMessage} />
             </Suspense>
           </div>
         </div>
