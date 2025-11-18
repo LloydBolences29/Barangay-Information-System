@@ -403,4 +403,30 @@ router.get("/household-search/:searchterm", async (req, res) => {
   }
 })
 
+//soft deletion of resident by setting the status to inactive
+router.patch("/soft-delete-resident/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { resident_status } = req.body;
+    
+    const db = await connectToDatabase();
+
+    const sql = `UPDATE resident_info 
+    SET resident_status = ? 
+    WHERE id = ?`;
+
+    await db.execute(sql, [resident_status, id]);
+
+    return res
+      .status(200)
+      .json({ message: "Resident deleted successfully." });
+  } catch (error) {
+    console.log("Error soft deleting resident:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error. Please Check your console" });
+  }
+
+})
+
 module.exports = router;

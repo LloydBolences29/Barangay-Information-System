@@ -14,16 +14,7 @@ const ModalComponent = ({ children, modalTitle, onHide, modalSize, modalShow, ad
         <Modal.Body>{children}</Modal.Body>
         <Modal.Footer>
           <Button onClick={onHide}>Close</Button>
-          {additionalButton && 
-            additionalButton.map((btn) =>(
-              <Button 
-                key={btn.id} 
-                variant={btn.variant}
-                onClick={btn.onClick}
-              >
-                {btn.label}
-              </Button>
-            ))}
+          {additionalButton && additionalButton}
         </Modal.Footer>
       </Modal>
     </>

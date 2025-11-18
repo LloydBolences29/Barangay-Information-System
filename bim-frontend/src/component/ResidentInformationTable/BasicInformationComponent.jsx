@@ -19,6 +19,7 @@ const BasicInformationComponent = ({
   const [notificationMessage, setNotificationMessage] = useState("");
   const { residents, loading } = useResident();
   const [openEditResidentModal, setOpenEditResidentModal] = useState(false);
+  const [openSoftDeleteModal, setOpenSoftDeleteModal] = useState(false);
   const [updatedResidentData, setUpdatedResidentData] = useState({
     lastname: selectedResident.lastname || "",
     firstname: selectedResident.firstname || "",
@@ -31,6 +32,7 @@ const BasicInformationComponent = ({
     occupation: selectedResident.occupation || "",
     resident_status: selectedResident.resident_status || "",
   });
+
 
 
   const handleSnackBarClose = (event, reason) => {
@@ -85,6 +87,36 @@ const BasicInformationComponent = ({
 
   console.log("Selected Resident:", updatedResidentData);
 
+  const handleSoftDelete = async () =>{
+    setOpenSoftDeleteModal(true);
+  }
+
+  const handleSoftDeleteConfirm = async () => {
+    try {
+      const response = await fetch(`${VITE_API_URL}/api/residents/soft-delete-resident/${selectedResident.id}`, {
+        method: "PATCH",
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ resident_status: "inactive" }),
+      })
+      const data = await response.json();
+      if (response.ok) {
+        setPageStatus("success");
+        setNotificationMessage("Resident deleted successfully!");
+        setSuccessSnackBarStatus(true);
+        setOpenSoftDeleteModal(false);
+        onUpdateSuccess({...selectedResident, resident_status: "inactive"});
+      }
+      
+    } catch (error) {
+      console.log("Error deleting resident:", error);
+      setPageStatus("error");
+      setNotificationMessage(error.message || "Failed to delete resident.");
+      setFailedSnackBarStatus(true);
+    }
+  }
 
   return (
     <div id="basic-info-container">
@@ -111,6 +143,7 @@ const BasicInformationComponent = ({
                 size="small"
                 startIcon={<AiOutlineEdit />}
                 sx={{ mb: 2 }}
+                onClick={handleSoftDelete}
               >
                 Delete
               </Button>
@@ -182,7 +215,18 @@ const BasicInformationComponent = ({
               modalSize="lg"
               modalShow={openEditResidentModal}
               onHide={() => setOpenEditResidentModal(false)}
-              additionalButton={buttons}
+              additionalButton={
+                <Button
+                  id="save-changes"
+                  variant="outlined"
+                  color="success"
+                  size="small"
+                  startIcon={<AiOutlineEdit />}
+                  onClick={handleUpdateResidentInfo}
+                >
+                  Save Changes
+                </Button>
+              }
             >
               <Form>
                 <Form.Group className="mb-3" controlId="formBasicInfo">
@@ -368,6 +412,36 @@ const BasicInformationComponent = ({
                   </div>
                 </Form.Group>
               </Form>
+            </ModalComponent>
+          )}
+
+          {openSoftDeleteModal && (
+            <ModalComponent
+              modalTitle="Confirm Deletion"
+              modalSize="md"
+              modalShow={openSoftDeleteModal}
+              onHide={() => setOpenSoftDeleteModal(false)}
+              additionalButton={
+                <Button
+                  id="confirm-delete"
+                  variant="outlined"
+                  color="error"
+                  size="small"
+                  startIcon={<AiOutlineEdit />}
+                  onClick={handleSoftDeleteConfirm}
+                >
+                  Confirm Delete
+                </Button>
+              }
+            >
+              <p>
+                Are you sure you want to delete the resident{" "}
+                <strong>
+                  {selectedResident.firstname} {selectedResident.lastname}
+                </strong>
+                ? This action can be undone by restoring the resident's
+                status.
+              </p>
             </ModalComponent>
           )}
           {/* Snackbar */}
