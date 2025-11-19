@@ -15,6 +15,8 @@ const HouseholdComponent = lazy(() =>
   import("../ResidentHousehold/HouseholdComponent")
 );
 
+const CertificateComponent = lazy(() => import("../CertificateComponent"));
+
 // Import the context (but you don't need to use it here if SearchList gets it)
 // We'll let SearchListComponent get its own data.
 
@@ -35,8 +37,8 @@ const ResidentInformationTable = ({ searchError }) => {
   };
 
   const handleUpdateSuccess = (updatedData) => {
-  setSelectedResident(updatedData); 
-};
+    setSelectedResident(updatedData);
+  };
 
   return (
     <Box sx={{ width: "100%", typography: "body1" }}>
@@ -61,7 +63,10 @@ const ResidentInformationTable = ({ searchError }) => {
           ) : (
             // Pass the "onSelectResident" function as a prop
             <Suspense fallback={<div>Loading...</div>}>
-              <SearchListComponent onSelectResident={handleSelectResident} onError={searchError} />
+              <SearchListComponent
+                onSelectResident={handleSelectResident}
+                onError={searchError}
+              />
             </Suspense>
           )}
         </TabPanel>
@@ -75,7 +80,17 @@ const ResidentInformationTable = ({ searchError }) => {
             <Typography>Please search and select a resident first.</Typography>
           )}
         </TabPanel>
-        <TabPanel value="3">Item Three</TabPanel>
+        <TabPanel value="3">
+          {selectedResident ? (
+            <Suspense fallback={<div>Loading...</div>}>
+              <CertificateComponent 
+              selectedResident={selectedResident}
+              />
+            </Suspense>
+          ) : (
+            <Typography>Please search and select a resident first.</Typography>
+          )}
+        </TabPanel>
       </TabContext>
     </Box>
   );
