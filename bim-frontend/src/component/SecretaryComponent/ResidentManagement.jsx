@@ -22,6 +22,7 @@ const SearchForHousehold = lazy(() =>
 const ResidentManagement = () => {
   const VITE_API_URL = import.meta.env.VITE_API_URL;
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("active");
   const [openModal, setOpenModal] = useState(false);
   const [openNewResidentModal, setOpenNewResidentModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -169,7 +170,7 @@ const ResidentManagement = () => {
 
     try {
       const response = await fetch(
-        `${VITE_API_URL}/api/residents/search-resident/${term}`
+        `${VITE_API_URL}/api/residents/search-resident/${term}?resident_status=${filterStatus}`
       );
 
       const data = await response.json();
@@ -269,6 +270,13 @@ const ResidentManagement = () => {
       setPageStatus("idle"); // Reset status
     }
   };
+
+  const handleFilterChange = (e) => {
+    const value = e.target.value;
+    setFilterStatus(value);
+    // Add filter logic here later
+  };
+
   return (
     <>
       <div id="ris-body">
@@ -294,6 +302,27 @@ const ResidentManagement = () => {
                 >
                   Search
                 </Button>
+              </div>
+              <div id="filter-actions">
+                <select
+                  id="filter-input"
+                  value={filterStatus}
+                  onChange={handleFilterChange}
+                  className="form-select"
+                >
+                  <option value="active">Active</option>
+                  <option value="all">All</option>
+                  <option value="inactive">Deleted</option>
+                  <option value="deceased">Deceased</option>
+                  <option value="moved out">Moved Out</option>
+                </select>
+                {/* <Button
+                  variant="outline-primary"
+                  className="rounded-pill px-3"
+                  size="sm"
+                >
+                  Filter
+                </Button> */}
               </div>
               <div id="action-buttons">
                 <Button

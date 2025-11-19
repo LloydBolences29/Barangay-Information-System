@@ -2,7 +2,7 @@ import { useState } from "react";
 import "../../styles/BasicInformationComponent.css";
 import { useResident } from "../../utils/ResidentContext";
 import { Container, Form, Row, Col, Spinner } from "react-bootstrap";
-import { Button } from "@mui/material";
+import { Button, Chip } from "@mui/material";
 import { AiOutlineEdit } from "react-icons/ai";
 import ModalComponent from "../ModalComponent";
 import SnackbarComponent from "../SnackbarComponent";
@@ -17,7 +17,7 @@ const BasicInformationComponent = ({
   const [successSnackBarStatus, setSuccessSnackBarStatus] = useState(false);
   const [failedSnackBarStatus, setFailedSnackBarStatus] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
-  const { residents, loading } = useResident();
+  const { residents, setResidents, loading } = useResident();
   const [openEditResidentModal, setOpenEditResidentModal] = useState(false);
   const [openSoftDeleteModal, setOpenSoftDeleteModal] = useState(false);
   const [updatedResidentData, setUpdatedResidentData] = useState({
@@ -60,11 +60,18 @@ const BasicInformationComponent = ({
 
       const data = await response.json();
       if (response.ok) {
+        const updated = { ...selectedResident, ...updatedResidentData };
+        // Update search results list
+    setResidents(prev =>
+        prev.map(res =>
+            res.id === updated.id ? updated : res
+        )
+    );
         setPageStatus("success");
         setNotificationMessage("Resident information updated successfully!");
         setSuccessSnackBarStatus(true);
         setOpenEditResidentModal(false);
-        onUpdateSuccess(updatedResidentData);
+        onUpdateSuccess(updated);
       }
     } catch (error) {
       console.log("Error updating resident info:", error);
@@ -194,15 +201,21 @@ const BasicInformationComponent = ({
 
                 <br />
                 <Row>
-                  <Col md={6}>
+                  <Col md={4}>
                     <Form.Label className="fw-bold">Citizenship:</Form.Label>
                     <div>{selectedResident.citizenship}</div>
                   </Col>
-                  <Col md={6}>
+                  <Col md={4}>
                     <Form.Label className="fw-bold">
                       Profession/Occupation:
                     </Form.Label>
                     <div>{selectedResident.occupation}</div>
+                  </Col>
+                  <Col md={4}>
+                    <Form.Label className="fw-bold">
+                     Resident Status:
+                    </Form.Label>
+                    <div><Chip label={selectedResident.resident_status === "inactive" ? "Deleted" : selectedResident.resident_status} color={selectedResident.resident_status === "active" ? "success" : "default"} /></div>
                   </Col>
                 </Row>
               </div>
@@ -406,6 +419,8 @@ const BasicInformationComponent = ({
                           <option value="active">Active</option>
                           <option value="moved-out">Moved Out</option>
                           <option value="deceased">Deceased</option>
+                          <option value="inactive">Deleted</option>
+
                         </Form.Select>
                       </Col>
                     </Row>

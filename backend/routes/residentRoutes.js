@@ -206,9 +206,10 @@ router.post("/add-resident-existing-household", async (req, res) => {
 router.get("/search-resident/:searchterm", async (req, res) => {
   try {
     const { searchterm } = req.params;
+    const { resident_status } = req.query;
     const db = await connectToDatabase();
 
-    const searchSql = `SELECT 
+    let searchSql = `SELECT 
       resident_info.id,
       resident_info.lastname,
       resident_info.firstname,
@@ -231,8 +232,15 @@ router.get("/search-resident/:searchterm", async (req, res) => {
       FROM resident_info
       JOIN households ON resident_info.householdId = households.id
       JOIN address ON households.addressID = address.id
-      WHERE resident_status = "active" AND (firstname LIKE ? OR lastname LIKE ?)`;
-    const [results] = await db.execute(searchSql, [searchterm, searchterm]);
+      WHERE (firstname LIKE ? OR lastname LIKE ?)`;
+
+    const params = [`%${searchterm}%`, `%${searchterm}%`];
+    if (resident_status && resident_status !== "all") {
+      searchSql += ` AND resident_info.resident_status = ?`;
+      params.push(resident_status);
+    }
+
+    const [results] = await db.execute(searchSql, params);
 
     if (results.length === 0) {
       return res.status(404).json({ message: "No residents found." });
@@ -428,5 +436,8 @@ router.patch("/soft-delete-resident/:id", async (req, res) => {
   }
 
 })
+
+
+
 
 module.exports = router;

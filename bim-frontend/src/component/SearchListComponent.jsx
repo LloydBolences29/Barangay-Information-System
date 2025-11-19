@@ -1,7 +1,15 @@
 import React from "react";
 import { useResident } from "../utils/ResidentContext";
 import { Spinner } from "react-bootstrap";
-import { List, ListItem, ListItemButton, ListItemText, Chip, Box, Typography } from "@mui/material";
+import {
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Chip,
+  Box,
+  Typography,
+} from "@mui/material";
 import { BsSearch } from "react-icons/bs";
 import { BiErrorCircle } from "react-icons/bi"; // Optional: Icon for error
 
@@ -16,13 +24,13 @@ const SearchListComponent = ({ onSelectResident, onError }) => {
           <Spinner animation="border" variant="primary" />
           <p>Loading residents...</p>
         </div>
-      ) : onError ? ( 
+      ) : onError ? (
         // 2. PRIORITY: Error Message (Check this BEFORE empty list)
-        <div className="text-center my-4" style={{ color: 'red' }}>
-           <div id="search-icon">
-             <BiErrorCircle size={40} />
-           </div>
-           <p>{onError}</p>
+        <div className="text-center my-4" style={{ color: "red" }}>
+          <div id="search-icon">
+            <BiErrorCircle size={40} />
+          </div>
+          <p>{onError}</p>
         </div>
       ) : residents.length === 0 ? (
         // 3. PRIORITY: Empty State (Default / Start)
@@ -41,11 +49,31 @@ const SearchListComponent = ({ onSelectResident, onError }) => {
             <ListItem key={resident.id} disablePadding>
               <ListItemButton onClick={() => onSelectResident(resident)}>
                 <ListItemText
-                  primary={`${resident.firstname} ${resident.middlename} ${
-                    resident.lastname
-                  } ${resident.name_extension === 'N/A' ? "" : resident.name_extension}`}
+                  primary={
+                    <>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <div>
+                          <Typography variant="body1">
+                            {resident.firstname} {resident.lastname} {resident.name_extension === "N/A" ? "" : resident.name_extension}
+                          </Typography>
+                        </div>
+                        <div>
+                          <Chip
+                            label={resident.resident_status === "inactive" ? "Deleted" : resident.resident_status}
+                            color={resident.resident_status === "active" ? "success" : "default"}
+                          />
+                        </div>
+                      </div>
+                    </>
+                  }
                 />
-                 {/* <Chip ... /> */}
+                {/* <Chip ... /> */}
               </ListItemButton>
             </ListItem>
           ))}

@@ -22,11 +22,18 @@
     align-items: baseline;
     gap: 1em;
 }
+
 #ris-actions #search-input{
     width: 300px;
     height: 100%;
     padding: 0.2em 0.5em;
     border-radius: 25px;
+}
+
+#filter-actions{
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
 }
 
 #modal-buttons{
