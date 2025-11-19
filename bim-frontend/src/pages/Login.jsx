@@ -44,6 +44,9 @@ const Login = () => {
           case "admin":
             navigate("/admin");
             break;
+          case "captain":
+            navigate("/captain");
+            break;
           case "secretary":
             navigate("/secretary");
             break;

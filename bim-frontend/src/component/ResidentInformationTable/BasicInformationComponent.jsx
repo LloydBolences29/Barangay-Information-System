@@ -6,6 +6,7 @@ import { Button, Chip } from "@mui/material";
 import { AiOutlineEdit } from "react-icons/ai";
 import ModalComponent from "../ModalComponent";
 import SnackbarComponent from "../SnackbarComponent";
+import { useAuth } from "../../utils/AuthProvider";
 
 const BasicInformationComponent = ({
   selectedResident,
@@ -32,8 +33,7 @@ const BasicInformationComponent = ({
     occupation: selectedResident.occupation || "",
     resident_status: selectedResident.resident_status || "",
   });
-
-
+  const { auth } = useAuth();
 
   const handleSnackBarClose = (event, reason) => {
     setSuccessSnackBarStatus(false);
@@ -62,11 +62,9 @@ const BasicInformationComponent = ({
       if (response.ok) {
         const updated = { ...selectedResident, ...updatedResidentData };
         // Update search results list
-    setResidents(prev =>
-        prev.map(res =>
-            res.id === updated.id ? updated : res
-        )
-    );
+        setResidents((prev) =>
+          prev.map((res) => (res.id === updated.id ? updated : res))
+        );
         setPageStatus("success");
         setNotificationMessage("Resident information updated successfully!");
         setSuccessSnackBarStatus(true);
@@ -81,49 +79,42 @@ const BasicInformationComponent = ({
     }
   };
 
-  const buttons = [
-    {
-      id: "save-changes",
-      label: "Save Changes",
-      variant: "outline-success",
-      onClick: () => {
-        handleUpdateResidentInfo();
-      },
-    },
-  ];
-
   console.log("Selected Resident:", updatedResidentData);
 
-  const handleSoftDelete = async () =>{
+  const handleSoftDelete = async () => {
     setOpenSoftDeleteModal(true);
-  }
+  };
 
   const handleSoftDeleteConfirm = async () => {
     try {
-      const response = await fetch(`${VITE_API_URL}/api/residents/soft-delete-resident/${selectedResident.id}`, {
-        method: "PATCH",
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ resident_status: "inactive" }),
-      })
+      const response = await fetch(
+        `${VITE_API_URL}/api/residents/soft-delete-resident/${selectedResident.id}`,
+        {
+          method: "PATCH",
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ resident_status: "inactive" }),
+        }
+      );
       const data = await response.json();
       if (response.ok) {
         setPageStatus("success");
         setNotificationMessage("Resident deleted successfully!");
         setSuccessSnackBarStatus(true);
         setOpenSoftDeleteModal(false);
-        onUpdateSuccess({...selectedResident, resident_status: "inactive"});
+        onUpdateSuccess({ ...selectedResident, resident_status: "inactive" });
       }
-      
     } catch (error) {
       console.log("Error deleting resident:", error);
       setPageStatus("error");
       setNotificationMessage(error.message || "Failed to delete resident.");
       setFailedSnackBarStatus(true);
     }
-  }
+  };
+
+  console.log("Auth in BasicInfoComponent:", auth);
 
   return (
     <div id="basic-info-container">
@@ -133,29 +124,32 @@ const BasicInformationComponent = ({
             <Button onClick={onBackClick} sx={{ mb: 2 }}>
               &larr; Back to Search Results
             </Button>
-            <div className="right-button-actions">
-              <Button
-                variant="outlined"
-                color="primary"
-                size="small"
-                startIcon={<AiOutlineEdit />}
-                sx={{ mb: 2 }}
-                onClick={handleOpenEditResidentModal}
-              >
-                Edit
-              </Button>
-              <Button
-                variant="outlined"
-                color="error"
-                size="small"
-                startIcon={<AiOutlineEdit />}
-                sx={{ mb: 2 }}
-                onClick={handleSoftDelete}
-              >
-                Delete
-              </Button>
-            </div>
+            {auth.user === "secretary" && (
+              <div className="right-button-actions">
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  size="small"
+                  startIcon={<AiOutlineEdit />}
+                  sx={{ mb: 2 }}
+                  onClick={handleOpenEditResidentModal}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  size="small"
+                  startIcon={<AiOutlineEdit />}
+                  sx={{ mb: 2 }}
+                  onClick={handleSoftDelete}
+                >
+                  Delete
+                </Button>
+              </div>
+            )}
           </div>
+
           <Form>
             <Form.Group className="mb-3" controlId="formBasicInfo">
               <div key={selectedResident._id || selectedResident.firstname}>
@@ -213,9 +207,22 @@ const BasicInformationComponent = ({
                   </Col>
                   <Col md={4}>
                     <Form.Label className="fw-bold">
-                     Resident Status:
+                      Resident Status:
                     </Form.Label>
-                    <div><Chip label={selectedResident.resident_status === "inactive" ? "Deleted" : selectedResident.resident_status} color={selectedResident.resident_status === "active" ? "success" : "default"} /></div>
+                    <div>
+                      <Chip
+                        label={
+                          selectedResident.resident_status === "inactive"
+                            ? "Deleted"
+                            : selectedResident.resident_status
+                        }
+                        color={
+                          selectedResident.resident_status === "active"
+                            ? "success"
+                            : "default"
+                        }
+                      />
+                    </div>
                   </Col>
                 </Row>
               </div>
@@ -420,7 +427,6 @@ const BasicInformationComponent = ({
                           <option value="moved-out">Moved Out</option>
                           <option value="deceased">Deceased</option>
                           <option value="inactive">Deleted</option>
-
                         </Form.Select>
                       </Col>
                     </Row>
@@ -454,8 +460,7 @@ const BasicInformationComponent = ({
                 <strong>
                   {selectedResident.firstname} {selectedResident.lastname}
                 </strong>
-                ? This action can be undone by restoring the resident's
-                status.
+                ? This action can be undone by restoring the resident's status.
               </p>
             </ModalComponent>
           )}

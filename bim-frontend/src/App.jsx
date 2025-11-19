@@ -11,7 +11,7 @@ function App() {
   );
   const AdminPage = lazy(() => import("./pages/Admin.jsx"));
   const SecretaryPage = lazy(() => import("./pages/Secretary.jsx"));
-
+  const CaptainPage = lazy(() => import("./pages/Captain.jsx"));
   return (
     <>
       <AuthProvider>
@@ -23,6 +23,13 @@ function App() {
               <Route element={<ProtectedRoutes allowedRoles={["admin"]} />}>
                 <Route path="/user-management" element={<UserManagement />} />
                 <Route path="/admin" element={<AdminPage />} />
+              </Route>
+              <Route element={<ProtectedRoutes allowedRoles={["admin"]} />}>
+                <Route path="/user-management" element={<UserManagement />} />
+                <Route path="/admin" element={<AdminPage />} />
+              </Route>
+              <Route element={<ProtectedRoutes allowedRoles={["captain"]} />}>
+                <Route path="/captain" element={<CaptainPage />} />
               </Route>
               <Route element={<ProtectedRoutes allowedRoles={["secretary"]} />}>
                 <Route path="/secretary" element={<SecretaryPage />} />

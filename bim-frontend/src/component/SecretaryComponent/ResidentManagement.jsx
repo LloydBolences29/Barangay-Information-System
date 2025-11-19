@@ -6,6 +6,7 @@ import StepperComponent from "../StepperComponent";
 
 import SnackbarComponent from "../SnackbarComponent";
 import { useResident } from "../../utils/ResidentContext";
+import { useAuth } from "../../utils/AuthProvider";
 
 const ResidentNameInformationForm = lazy(() =>
   import("../ResidentNameInformationForm")
@@ -21,6 +22,7 @@ const SearchForHousehold = lazy(() =>
 
 const ResidentManagement = () => {
   const VITE_API_URL = import.meta.env.VITE_API_URL;
+  const { auth } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("active");
   const [openModal, setOpenModal] = useState(false);
@@ -324,6 +326,7 @@ const ResidentManagement = () => {
                   Filter
                 </Button> */}
               </div>
+              {auth.user === "secretary" && (
               <div id="action-buttons">
                 <Button
                   variant="outline-primary"
@@ -334,6 +337,7 @@ const ResidentManagement = () => {
                   Add Resident
                 </Button>
               </div>
+              )}
             </div>
             <Suspense fallback={<div>Loading...</div>}>
               <ResidentInformationTable searchError={searchErrorMessage} />
