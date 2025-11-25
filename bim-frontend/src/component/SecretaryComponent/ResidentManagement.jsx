@@ -47,7 +47,7 @@ const ResidentManagement = () => {
     house_no: "",
     street: "",
     address: "",
-    resident_status: ""
+    resident_status: "",
   });
   const [pageStatus, setPageStatus] = useState("idle");
   const [successSnackBarStatus, setSuccessSnackBarStatus] = useState(false);
@@ -67,32 +67,28 @@ const ResidentManagement = () => {
       ...prevData,
       household_id: householdId,
     }));
-  }
-
+  };
 
   //having an error in submitting a form for existing resident
   // debug this becuase when i submit one form from existing resident it creates a new household
   //not getting the household id from the selected household
   //function to submit the form
   const handleSubmitForm = async () => {
-        let url = "";
+    let url = "";
 
-    if(formType === "existing-resident"){
+    if (formType === "existing-resident") {
       url = `${VITE_API_URL}/api/residents/add-resident-existing-household`;
-    }else{
+    } else {
       url = `${VITE_API_URL}/api/residents/add-resident`;
     }
     try {
-      const response = await fetch(
-        url,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
       console.log("Form data submitted:", formData);
 
@@ -103,6 +99,24 @@ const ResidentManagement = () => {
         setNotificationMessage("Resident added successfully!");
         setSuccessSnackBarStatus(true);
         setOpenNewResidentModal(false);
+        //set the fields to empty after submitting
+        setFormData({
+          firstname: "",
+          middlename: "",
+          lastname: "",
+          name_extension: "N/A",
+          relationship_to_head: "",
+          dob: "",
+          place_of_birth: "",
+          sex: "",
+          civil_status: "",
+          citizenship: "",
+          occupation: "",
+          house_no: "",
+          street: "",
+          address: "",
+          resident_status: "",
+        });
       } else {
         setPageStatus("error");
         setNotificationMessage(data.message || "Failed to add resident.");
@@ -153,7 +167,6 @@ const ResidentManagement = () => {
       }));
     }
 
-
     setOpenModal(false);
     setTimeout(() => {
       setOpenNewResidentModal(true);
@@ -169,7 +182,6 @@ const ResidentManagement = () => {
   };
 
   const handleSearchResident = async (term) => {
-
     try {
       const response = await fetch(
         `${VITE_API_URL}/api/residents/search-resident/${term}?resident_status=${filterStatus}`
@@ -182,7 +194,7 @@ const ResidentManagement = () => {
         setPageStatus("success");
         setNotificationMessage("Residents fetched successfully!");
         setSuccessSnackBarStatus(true);
-      }else if (response.status === 404){
+      } else if (response.status === 404) {
         setResidents([]);
         setSearchErrorMessage("No residents found.");
       }
@@ -199,12 +211,10 @@ const ResidentManagement = () => {
     label: "Search Household",
     description: (
       <Suspense fallback={<div>Loading...</div>}>
-        <SearchForHousehold 
-          onHouseholdSelect={handleHouseholdSelect}
-        />
+        <SearchForHousehold onHouseholdSelect={handleHouseholdSelect} />
       </Suspense>
     ),
-  }
+  };
 
   const ResidentNameStep = {
     label: "Resident Name",
@@ -235,10 +245,7 @@ const ResidentManagement = () => {
     label: "Residence & Profession",
     description: (
       <Suspense fallback={<div>Loading...</div>}>
-        <AddressInfoForm
-          formData={formData}
-          handleChange={handleFormChange}
-        />
+        <AddressInfoForm formData={formData} handleChange={handleFormChange} />
       </Suspense>
     ),
   };
@@ -248,7 +255,6 @@ const ResidentManagement = () => {
   if (formType === "existing-resident") {
     steps.push(SearchForHouseholdStep);
   }
-
 
   steps.push(ResidentNameStep);
   steps.push(PersonalDetailsStep);
@@ -262,7 +268,7 @@ const ResidentManagement = () => {
     if (searchErrorMessage) {
       setSearchErrorMessage("");
       // If you have a separate state for 'searchError', clear that too
-      // setPageStatus("idle"); 
+      // setPageStatus("idle");
     }
 
     // 2. (Optional) If the input is empty, reset everything to default
@@ -327,16 +333,16 @@ const ResidentManagement = () => {
                 </Button> */}
               </div>
               {auth.user === "secretary" && (
-              <div id="action-buttons">
-                <Button
-                  variant="outline-primary"
-                  className="rounded-pill px-3"
-                  size="sm"
-                  onClick={handleOpenModal}
-                >
-                  Add Resident
-                </Button>
-              </div>
+                <div id="action-buttons">
+                  <Button
+                    variant="outline-primary"
+                    className="rounded-pill px-3"
+                    size="sm"
+                    onClick={handleOpenModal}
+                  >
+                    Add Resident
+                  </Button>
+                </div>
               )}
             </div>
             <Suspense fallback={<div>Loading...</div>}>

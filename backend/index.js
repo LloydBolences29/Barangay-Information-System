@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 //importing routes
 const userRoutes =  require("./routes/userRoutes");
 const residentRoutes = require("./routes/residentRoutes");
+const statsRoutes = require("./routes/statsRoutes");
 
 
 app.use(cors(
@@ -24,6 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/users", userRoutes);
 app.use("/api/residents", residentRoutes);
+app.use("/api/stats", statsRoutes);
 
 
 const PORT = process.env.PORT || 1000;
