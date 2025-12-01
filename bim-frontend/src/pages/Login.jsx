@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Container, Form, Button } from "react-bootstrap";
+import { Container, Form, Button, Alert } from "react-bootstrap";
 import "../styles/Login.css";
 import { useAuth } from "../utils/AuthProvider.jsx";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +13,8 @@ const Login = () => {
     username: "",
     password: "",
   });
+  const [loginSuccessMessage, setLoginSuccessMessage] = useState("");
+  const [loginError, setLoginError] = useState("");
 
   const handleOnSubmit = async (e) => {
     e.preventDefault();
@@ -28,36 +30,49 @@ const Login = () => {
       });
       console.log("Response:", payload);
 
+      const res = await response.json();
       if (response.ok) {
-        const res = await response.json();
         console.log("Login successful:", res);
         setPayload({ username: "", password: "" });
+        setLoginError("");
+        setLoginSuccessMessage("Login successful! Redirecting...");
+        setTimeout(() => {
+          setLoginSuccessMessage("");
+          // Optionally, redirect the user
+          setAuth({
+            loading: false,
+            isAuthenticated: true,
+            user: res.user.role,
+          });
 
-        // Optionally, redirect the user
-        setAuth({
-          loading: false,
-          isAuthenticated: true,
-          user: res.user.role,
-        });
-
-        switch (res.user.role) {
-          case "admin":
-            navigate("/admin");
-            break;
-          case "captain":
-            navigate("/captain");
-            break;
-          case "secretary":
-            navigate("/secretary");
-            break;
-          // Add more roles and their respective redirects as needed
-          default:
-            navigate("/");
-            break;
-        }
+          switch (res.user.role) {
+            case "admin":
+              navigate("/admin");
+              break;
+            case "captain":
+              navigate("/captain");
+              break;
+            case "secretary":
+              navigate("/secretary");
+              break;
+            // Add more roles and their respective redirects as needed
+            default:
+              navigate("/");
+              break;
+          }
+        }, 5000);
+      }else{
+        setLoginError(res.message);
+        setTimeout(() => {
+          setLoginError("");
+        }, 5000);
       }
     } catch (error) {
       console.log("Error during login:", error);
+      setLoginError(error.message || "An error occurred during login.");
+      setTimeout(() => {
+        setLoginError("");
+      }, 5000);
     }
   };
   return (
@@ -102,6 +117,10 @@ const Login = () => {
                   required
                 />
               </Form.Group>
+              {loginError && <p style={{ color: "red" }}>{loginError}</p>}
+              {loginSuccessMessage && (
+                <p style={{ color: "green" }}>{loginSuccessMessage}</p>
+              )}
               <Button variant="outline-primary" type="submit">
                 Login
               </Button>
