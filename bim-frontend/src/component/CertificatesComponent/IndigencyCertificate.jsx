@@ -114,6 +114,7 @@ const styles = StyleSheet.create({
     flex: 1, // Remaining percentage
     // OR use flex: 1 to automatically take whatever is left
     padding: 20,
+    paddingTop: 0,
   },
 
   dateRequested: {

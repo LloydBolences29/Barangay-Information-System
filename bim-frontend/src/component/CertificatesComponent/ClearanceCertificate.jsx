@@ -1,55 +1,334 @@
-import React from 'react'
-import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
+import React from "react";
+import {
+  Page,
+  Text,
+  View,
+  Document,
+  StyleSheet,
+  Image,
+} from "@react-pdf/renderer";
 
 const styles = StyleSheet.create({
-  page: { padding: 40, fontFamily: 'Helvetica' },
-  title: { fontSize: 20, fontWeight: 'bold', textAlign: 'center', textDecoration: 'underline', marginBottom: 20, textTransform: 'uppercase' },
-  text: { fontSize: 12, marginBottom: 10, lineHeight: 1.5, textAlign: 'justify', textIndent: 30 },
-  header: { textAlign: 'center', marginBottom: 20 },
-  signature: { marginTop: 50, textAlign: 'right' },
-  footer: { marginTop: 30, fontSize: 10 }
+  page: { padding: 20, fontFamily: "Helvetica", flex: 1 },
+  watermarkWrapper: {
+    position: 'absolute', // Takes it out of the normal flow
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center', // Centers vertically
+    alignItems: 'center',     // Centers horizontally
+    zIndex: -1,               // Hints that this should be behind
+  },
+  
+  // 2. The actual image style
+  watermarkImage: {
+    width: 400,    // Adjust size as needed
+    height: 400,   
+    opacity: 0.1,  // KEY: Makes it faint (1.0 is solid, 0.1 is very faint)
+    transform: 'rotate(-30deg)', // Optional: Tilted look
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    textDecoration: "underline",
+    marginBottom: 20,
+    textTransform: "uppercase",
+  },
+  text: {
+    fontSize: 12,
+    marginBottom: 10,
+    lineHeight: 1.5,
+    textAlign: "justify",
+    textIndent: 30,
+  },
+
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+
+  headerPhilippines: {
+    fontSize: 12,
+    textAlign: "center",
+    marginBottom: 2,
+  },
+  headerTitle: {
+    fontSize: 16,
+    marginBottom: 2,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  headerBarangay: {
+    fontSize: 12,
+    textAlign: "center",
+    marginBottom: 2,
+  },
+  headerRegion: {
+    fontSize: 12,
+  },
+  leftLogo: {
+    width: 80,
+    height: 80,
+  },
+  rightLogo: {
+    width: 80,
+    height: 80,
+  },
+  headerTextContainer: {
+    flex: 1, // KEY: This forces it to take up all remaining width
+    textAlign: "center", // Centers the text inside that width
+    marginLeft: 10, // Optional: Safety space from left logo
+    marginRight: 10, // Optional: Safety space from right logo
+  },
+
+  clearanceContainer: {
+    marginTop: 12,
+    flexDirection: "row",
+    flex: 1,
+  },
+
+  contentTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  controlNumbertext: {
+    fontSize: 12,
+    textAlign: "right",
+    marginBottom: 15,
+    marginTop: 15,
+  },
+  toWhomItMayConcern: {
+    fontSize: 14,
+    marginBottom: 15,
+  },
+  leftWrapper: {
+    width: "30%",
+    borderRight: 2,
+    borderColor: "#000",
+  },
+  brgyOfficialText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+
+  officialNameText: {
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  positionText: {
+    fontSize: 12,
+    marginBottom: 20,
+    marginTop: 0,
+    color: "red",
+  },
+
+  noteText: {
+    fontSize: 10,
+    marginTop: 20,
+    fontWeight: "bold",
+  },
+  rightWrapper: {
+    flex: 1, // Remaining percentage
+    // OR use flex: 1 to automatically take whatever is left
+    padding: 20,
+    paddingTop: 0,
+  },
+
+  dateRequested: {
+    fontSize: 12,
+    marginBottom: 30,
+    lineHeight: 1.5,
+    textAlign: "justify",
+    textIndent: 30,
+  },
+  firstTextContent: {
+    fontSize: 12,
+    lineHeight: 1.5,
+    textAlign: "justify",
+    textIndent: 30,
+    marginBottom: 15,
+  },
+  residentInfotext: {
+    fontSize: 12,
+    lineHeight: 1.5,
+    textAlign: "justify",
+    textIndent: 30,
+  },
 });
-const ClearanceCertificate = ({ resident, purpose, orNumber, amount }) => {
+import brgyLogo from "../../assets/BRGYLOGO.png";
+import pasayLogo from "../../assets/pasayLogo.png";
+const ClearanceCertificate = ({ resident, purpose }) => {
+  const date = new Date();
+
+  // 2. Extract the parts
+  const day = date.getDate();
+  const month = date.toLocaleString("default", { month: "long" });
+  const year = date.getFullYear();
+
+  // 3. Helper function for "st, nd, rd, th"
+  const getOrdinalDay = (n) => {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  };
   return (
-<Document>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.header}>
-        <Text>Republic of the Philippines</Text>
-        <Text>City of Pasay</Text>
-        <Text style={{fontWeight:'bold'}}>BARANGAY 35</Text>
-      </View>
+    <Document>
+      <Page size="LETTER" style={styles.page}>
+        {/* Watermark logo */}
+        <View style={styles.watermarkWrapper}>
+          <Image src={brgyLogo} style={styles.watermarkImage} />
+        </View>
+        {/* Existing Header, Title, To Whom It May Concern, and initial text blocks
+        will remain above the columns, spanning full width. */}
+        <View style={styles.headerContainer}>
+          {/* Left Logo */}
+          <Image src={brgyLogo} style={styles.leftLogo} />
 
-      <Text style={styles.title}>BARANGAY CLEARANCE</Text>
+          {/* Center Text */}
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.headerPhilippines}>
+              Republic of the Philippines
+            </Text>
+            <Text style={styles.headerTitle}>
+              CERTIFICATE OF SANGGUNIANG BARANGAY
+            </Text>
+            <Text style={styles.headerBarangay}>
+              Barangay 35, Zone 03, District 01
+            </Text>
+            <Text style={styles.headerRegion}>Pasay City, Metro Manila</Text>
+          </View>
 
-      <Text style={styles.text}>TO WHOM IT MAY CONCERN:</Text>
+          {/* Right Logo */}
+          <Image src={pasayLogo} style={styles.rightLogo} />
+        </View>
 
-      <Text style={styles.text}>
-        This is to certify that <Text style={{fontWeight:'bold'}}>{resident.firstname} {resident.lastname}</Text>, 
-        of legal age, {resident.civil_status}, Filipino, is a resident of {resident.house_no} {resident.street}.
-      </Text>
+        <View style={styles.clearanceContainer}>
+          <View style={styles.leftWrapper}>
+            <Text style={styles.brgyOfficialText}>Barangay Officials</Text>
+            <Text style={styles.officialNameText}>Lily M. Balanon</Text>
+            <Text style={styles.positionText}>Barangay Chairwoman</Text>
+            <Text style={styles.officialNameText}>Sunny Boy Loriezo</Text>
+            <Text style={styles.positionText}>Barangay Kagawad</Text>
+            <Text style={styles.officialNameText}>Hetty N. Dalugdugan</Text>
+            <Text style={styles.positionText}>Barangay Kagawad</Text>
+            <Text style={styles.officialNameText}>Enrique M. Galicer Jr.</Text>
+            <Text style={styles.positionText}>Barangay Kagawad</Text>
+            <Text style={styles.officialNameText}>Rofil L. Abonador</Text>
+            <Text style={styles.positionText}>Barangay Kagawad</Text>
+            <Text style={styles.officialNameText}>salvador V. Aguilar</Text>
+            <Text style={styles.positionText}>Barangay Kagawad</Text>
+            <Text style={styles.officialNameText}>Mailene T. Balmes</Text>
+            <Text style={styles.positionText}>Barangay Kagawad</Text>
+            <Text style={styles.officialNameText}>Marjoe E. Dieto</Text>
+            <Text style={styles.positionText}>Barangay Kagawad</Text>
+            <Text style={styles.officialNameText}>Angela Mae D. Balmes</Text>
+            <Text style={styles.positionText}>SK Chairman</Text>
+            <Text style={styles.officialNameText}>Myle M. Laqui</Text>
+            <Text style={styles.positionText}>Barangay Secretary</Text>
+            <Text style={styles.officialNameText}>
+              Maxima Angelita R. Arasa
+            </Text>
+            <Text style={styles.positionText}>Barangay Treasurer</Text>
+            <Text style={styles.noteText}>
+              Note:{" "}
+              <Text style={{ fontSize: 10, color: "red" }}>
+                "Not Valid Without Dryseal"
+              </Text>
+            </Text>
+          </View>
+          <View style={styles.rightWrapper}>
+            <Text style={styles.contentTitle}>CERTIFICATION</Text>
+            <Text style={styles.controlNumbertext}>
+              Control No. 2025 - _________
+            </Text>
+            <Text style={styles.toWhomItMayConcern}>
+              TO WHOM IT MAY CONCERN:
+            </Text>
 
-      <Text style={styles.text}>
-        I further certify that the above-named person has no derogatory record filed in this office.
-      </Text>
+            <Text style={styles.residentInfotext}>
+              Name: {resident.firstname} {resident.middlename}{" "}
+              {resident.lastname}
+            </Text>
 
-      <Text style={styles.text}>
-        This certification is issued for the purpose of: 
-        <Text style={{fontWeight:'bold', textTransform:'uppercase'}}> {purpose}</Text>.
-      </Text>
+            <Text style={styles.residentInfotext}>Address: {resident.address}</Text>
+            <Text style={styles.residentInfotext}>
+              Contact Number:{" "}
+              {resident.contactnumber ? resident.contactnumber : "N/A"}
+            </Text>
 
-      <View style={styles.signature}>
-        <Text style={{fontWeight:'bold', textDecoration:'underline'}}>HON. KAPITAN NAME</Text>
-        <Text>Punong Barangay</Text>
-      </View>
+            <Text style={styles.residentInfotext}>
+              Birthdate:{" "}
+              {resident.dob
+                ? new Date(resident.dob).toLocaleDateString()
+                : "N/A"}
+            </Text>
 
-      <View style={styles.footer}>
-        <Text>O.R. No: {orNumber}</Text>
-        <Text>Amount Paid: {amount}</Text>
-        <Text>Date Issued: {new Date().toLocaleDateString()}</Text>
-      </View>
-    </Page>
-  </Document>
-  )
-}
+            <Text style={styles.residentInfotext}>
+              Birth Place:{" "}
+              {resident.place_of_birth ? resident.place_of_birth : "N/A"}
+            </Text>
 
-export default ClearanceCertificate
+            <Text style={styles.residentInfotext}>
+              Civil Status:{" "}
+              {resident.civil_status
+                ? resident.civil_status.charAt(0).toUpperCase() +
+                  resident.civil_status.slice(1)
+                : "N/A"}
+            </Text>
+
+            <Text style={styles.residentInfotext}>
+              Purpose: {purpose ? purpose : "N/A"}
+            </Text>
+
+            <Text style={styles.dateRequested}>
+              Date Requested: {new Date().toLocaleDateString()}
+            </Text>
+
+            <Text style={styles.firstTextContent}>
+              This is to certify that the person mentioned above is of Legal age
+              and a registered voter/member of the said barangay.
+            </Text>
+            <Text style={styles.firstTextContent}>
+              That as per interview and investigation conducted by the Barangay
+              Officials of Barangay 35, Zone 03, Pasay City, the said
+              constituents has not enough source of income.
+            </Text>
+            <Text style={styles.firstTextContent}>
+              He/She is known to be of good moral character with good reputation
+              in the community.
+            </Text>
+            <Text style={styles.firstTextContent}>This certification is issued upon the request of the above-mentioned person for <Text style={{ fontSize: 12, textDecoration: "underline"}}>{purpose}</Text> purposes.</Text>
+            <Text style={styles.text}>
+              Issued this {getOrdinalDay(day)} day of {month}, {year}.
+            </Text>
+            <Text
+              style={{
+                textDecoration: "underline",
+                marginTop: 10,
+                marginBottom: 0,
+                fontSize: 14,
+                fontWeight: "bold",
+                textAlign: "right",
+              }}
+            >
+              Lily M. Balanon
+            </Text>
+            <Text style={{ fontSize: 12, textAlign: "right" }}>
+              Punong Barangay
+            </Text>
+          </View>
+        </View>
+      </Page>
+    </Document>
+  );
+};
+
+export default ClearanceCertificate;

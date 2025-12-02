@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "../styles/CertificateComponent.css";
 import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
-import { FaFileAlt, FaHandHoldingHeart, FaPrint } from "react-icons/fa";
+import { FaFileAlt, FaHandHoldingHeart, FaPrint, FaBriefcase } from "react-icons/fa";
 
 //MUI imports
 import { Divider } from "@mui/material";
@@ -9,6 +9,7 @@ import { Row, Col, Card, Button, Modal, Form } from "react-bootstrap";
 
 import ClearanceCertificate from "../component/CertificatesComponent/ClearanceCertificate";
 import IndigencyCertificate from "../component/CertificatesComponent/IndigencyCertificate";
+import WorkingPermit from "../component/CertificatesComponent/WorkingPermit";
 const CertificateComponent = ({ selectedResident }) => {
   const [showModal, setShowModal] = useState(false);
   const [certType, setCertType] = useState(""); // 'Indigency' or 'Clearance'
@@ -36,8 +37,17 @@ const CertificateComponent = ({ selectedResident }) => {
         <ClearanceCertificate
           resident={selectedResident}
           purpose={purpose}
-          orNumber={orNumber}
-          amount={amount}
+
+        />
+      );
+    }
+
+    if (type === "WorkingPermit") {
+      return (
+        <WorkingPermit
+          resident={selectedResident}
+          purpose={purpose}
+ 
         />
       );
     }
@@ -60,7 +70,7 @@ const CertificateComponent = ({ selectedResident }) => {
         <div className="p-3">
           <h5 className="mb-4">Select Document to Generate</h5>
 
-          <Row>
+          <Row className="g-4">
             {/* OPTION 1: CLEARANCE */}
             <Col md={6}>
               <Card
@@ -83,7 +93,7 @@ const CertificateComponent = ({ selectedResident }) => {
             <Col md={6}>
               <Card
                 className="text-center p-4 shadow-sm h-100"
-                style={{ cursor: "pointer", border: "1px solid #198754" }}
+                style={{ cursor: "pointer", border: "1px solid #02b027ff" }}
                 onClick={() => handleOpen("Indigency")}
               >
                 <Card.Body>
@@ -93,6 +103,23 @@ const CertificateComponent = ({ selectedResident }) => {
                     For financial assistance, scholarship, or medical help.
                   </p>
                   <Button variant="outline-success">Select</Button>
+                </Card.Body>
+              </Card>
+            </Col>
+
+            <Col md={6}>
+              <Card
+                className="text-center p-4 shadow-sm h-100"
+                style={{ cursor: "pointer", border: "1px solid #ecdd06ff" }}
+                onClick={() => handleOpen("WorkingPermit")}
+              >
+                <Card.Body>
+                  <FaBriefcase size={40} className="text-warning mb-3" />
+                  <h4>Working Permit</h4>
+                  <p className="text-muted">
+                    For employment or business purposes.
+                  </p>
+                  <Button variant="outline-warning">Select</Button>
                 </Card.Body>
               </Card>
             </Col>
