@@ -3,6 +3,8 @@ import { Container, Form, Button, Alert } from "react-bootstrap";
 import "../styles/Login.css";
 import { useAuth } from "../utils/AuthProvider.jsx";
 import { useNavigate } from "react-router-dom";
+import { FaEye } from "react-icons/fa";
+import { FaEyeSlash } from "react-icons/fa";
 
 const Login = () => {
   const VITE_API_URL = import.meta.env.VITE_API_URL;
@@ -15,6 +17,7 @@ const Login = () => {
   });
   const [loginSuccessMessage, setLoginSuccessMessage] = useState("");
   const [loginError, setLoginError] = useState("");
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
 
   const handleOnSubmit = async (e) => {
     e.preventDefault();
@@ -55,17 +58,20 @@ const Login = () => {
             case "secretary":
               navigate("/secretary");
               break;
+              case "treasurer":
+              navigate("/treasurer");
+              break;
             // Add more roles and their respective redirects as needed
             default:
               navigate("/");
               break;
           }
-        }, 5000);
-      }else{
+        }, 2500);
+      } else {
         setLoginError(res.message);
         setTimeout(() => {
           setLoginError("");
-        }, 5000);
+        }, 2500);
       }
     } catch (error) {
       console.log("Error during login:", error);
@@ -79,7 +85,7 @@ const Login = () => {
     <div>
       <Container id="login-main-container">
         <div id="welcome-header-text">
-          <h1>Welcome to Your System</h1>
+          <h1>Welcome to Your Barangay Information System</h1>
         </div>
         <div
           id="login-container"
@@ -107,15 +113,36 @@ const Login = () => {
               </Form.Group>
               <Form.Group className="mb-3" controlId="formBasicPassword">
                 <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  value={payload.password}
-                  placeholder="Password"
-                  onChange={(e) =>
-                    setPayload({ ...payload, password: e.target.value })
-                  }
-                  required
-                />
+                <div style={{ position: "relative" }}>
+                  <Form.Control
+                    type={showLoginPassword ? "text" : "password"}
+                    value={payload.password}
+                    placeholder="Password"
+                    onChange={(e) =>
+                      setPayload({ ...payload, password: e.target.value })
+                    }
+                    required
+                  />
+                  <span
+                    variant="link"
+                    size="sm"
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      padding: 0,
+                    }}
+                    onClick={() => setShowLoginPassword((prev) => !prev)}
+                    tabIndex={-1}
+                  >
+                    {showLoginPassword ? (
+                      <FaEyeSlash color="black" />
+                    ) : (
+                      <FaEye color="black" />
+                    )}
+                  </span>
+                </div>
               </Form.Group>
               {loginError && <p style={{ color: "red" }}>{loginError}</p>}
               {loginSuccessMessage && (

@@ -20,8 +20,7 @@ const SecretaryDashboard = () => {
   const fetchNumbersOfResidentsAdded = async () => {
     try {
       const res = await fetch(
-        `${VITE_API_URL}/api/stats/number-of-added-residents?${period})`
-      );
+        `${VITE_API_URL}/api/stats/number-of-added-residents?period=${period}`);
 
       const data = await res.json();
       if (res.ok) {

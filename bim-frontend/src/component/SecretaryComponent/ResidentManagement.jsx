@@ -289,7 +289,7 @@ const ResidentManagement = () => {
     <>
       <div id="ris-body">
         <div id="header-title">
-          <h1> System</h1>
+          <h1> Resident Information System</h1>
         </div>
 
         <div className="container">
