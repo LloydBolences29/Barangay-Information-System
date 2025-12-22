@@ -34,37 +34,39 @@ router.get("/number-of-added-residents", async (req, res) => {
     let sql = "";
 
     if (period === "monthly") {
-      sql = `SELECT 
-          DATE_FORMAT(created_at, '%Y-%m-%d') as label, 
+      sql = `
+        SELECT 
+          DATE_FORMAT(created_at, '%Y-%m') as label, 
           COUNT(*) as count 
         FROM resident_info 
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-        GROUP BY DATE(created_at)
-        ORDER BY DATE(created_at) ASC`;
+        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+        GROUP BY label 
+        ORDER BY label ASC
+      `;
     }
 
     else if (period === "weekly") {
-        sql = `
+      sql = `
         SELECT 
           DATE_FORMAT(created_at, 'Week %u %Y') as label, 
           COUNT(*) as count 
         FROM resident_info 
         WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 12 WEEK)
-        GROUP BY YEARWEEK(created_at)
-        ORDER BY YEARWEEK(created_at) ASC
+GROUP BY label
+        ORDER BY MIN(created_at) ASC
       `;
 
     }
-    else{
-        // DEFAULT: GROUP BY DAY (Last 7 Days)
+    else {
+      // DEFAULT: GROUP BY DAY (Last 7 Days)
       sql = `
         SELECT 
           DATE_FORMAT(created_at, '%Y-%m-%d') as label, 
           COUNT(*) as count 
         FROM resident_info 
         WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-        GROUP BY DATE(created_at)
-        ORDER BY DATE(created_at) ASC
+        GROUP BY label
+        ORDER BY label ASC
       `;
     }
 
