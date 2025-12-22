@@ -26,37 +26,39 @@ router.get("/all-stats", async (req, res) => {
 });
 
 //get the number of resident added per day for the last 7 days, week or month
+// backend route
+
 router.get("/number-of-added-residents", async (req, res) => {
   try {
     const db = await connectToDatabase();
-    const { period } = req.query;
+    const { period } = req.query; // Now this will work because frontend sends ?period=...
 
     let sql = "";
 
     if (period === "monthly") {
+      // FIX: Look back 12 months, Group by Year-Month, Format as YYYY-MM
       sql = `
         SELECT 
           DATE_FORMAT(created_at, '%Y-%m') as label, 
           COUNT(*) as count 
         FROM resident_info 
         WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
-        GROUP BY label 
-        ORDER BY label ASC
+        GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+        ORDER BY DATE_FORMAT(created_at, '%Y-%m') ASC
       `;
-    }
-
+    } 
     else if (period === "weekly") {
+      // Weekly looks okay, but ensures standard "Week U Year" format
       sql = `
         SELECT 
           DATE_FORMAT(created_at, 'Week %u %Y') as label, 
           COUNT(*) as count 
         FROM resident_info 
         WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 12 WEEK)
-GROUP BY label
-        ORDER BY MIN(created_at) ASC
+        GROUP BY YEARWEEK(created_at)
+        ORDER BY YEARWEEK(created_at) ASC
       `;
-
-    }
+    } 
     else {
       // DEFAULT: GROUP BY DAY (Last 7 Days)
       sql = `
@@ -65,8 +67,8 @@ GROUP BY label
           COUNT(*) as count 
         FROM resident_info 
         WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-        GROUP BY label
-        ORDER BY label ASC
+        GROUP BY DATE(created_at)
+        ORDER BY DATE(created_at) ASC
       `;
     }
 

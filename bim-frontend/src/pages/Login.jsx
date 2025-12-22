@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Container, Form, Button } from "react-bootstrap";
+import { Container, Form, Button, Alert } from "react-bootstrap";
 import "../styles/Login.css";
 import { useAuth } from "../utils/AuthProvider.jsx";
 import { useNavigate } from "react-router-dom";
+import { FaEye } from "react-icons/fa";
+import { FaEyeSlash } from "react-icons/fa";
 
 const Login = () => {
   const VITE_API_URL = import.meta.env.VITE_API_URL;
@@ -13,6 +15,9 @@ const Login = () => {
     username: "",
     password: "",
   });
+  const [loginSuccessMessage, setLoginSuccessMessage] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
 
   const handleOnSubmit = async (e) => {
     e.preventDefault();
@@ -28,43 +33,59 @@ const Login = () => {
       });
       console.log("Response:", payload);
 
+      const res = await response.json();
       if (response.ok) {
-        const res = await response.json();
         console.log("Login successful:", res);
         setPayload({ username: "", password: "" });
+        setLoginError("");
+        setLoginSuccessMessage("Login successful! Redirecting...");
+        setTimeout(() => {
+          setLoginSuccessMessage("");
+          // Optionally, redirect the user
+          setAuth({
+            loading: false,
+            isAuthenticated: true,
+            user: res.user.role,
+          });
 
-        // Optionally, redirect the user
-        setAuth({
-          loading: false,
-          isAuthenticated: true,
-          user: res.user.role,
-        });
-
-        switch (res.user.role) {
-          case "admin":
-            navigate("/admin");
-            break;
-          case "captain":
-            navigate("/captain");
-            break;
-          case "secretary":
-            navigate("/secretary");
-            break;
-          // Add more roles and their respective redirects as needed
-          default:
-            navigate("/");
-            break;
-        }
+          switch (res.user.role) {
+            case "admin":
+              navigate("/admin");
+              break;
+            case "captain":
+              navigate("/captain");
+              break;
+            case "secretary":
+              navigate("/secretary");
+              break;
+              case "treasurer":
+              navigate("/treasurer");
+              break;
+            // Add more roles and their respective redirects as needed
+            default:
+              navigate("/");
+              break;
+          }
+        }, 2500);
+      } else {
+        setLoginError(res.message);
+        setTimeout(() => {
+          setLoginError("");
+        }, 2500);
       }
     } catch (error) {
       console.log("Error during login:", error);
+      setLoginError(error.message || "An error occurred during login.");
+      setTimeout(() => {
+        setLoginError("");
+      }, 5000);
     }
   };
   return (
     <div>
       <Container id="login-main-container">
         <div id="welcome-header-text">
-          <h1>Welcome to Your System</h1>
+          <h1>Welcome to Your Barangay Information System</h1>
         </div>
         <div
           id="login-container"
@@ -92,16 +113,41 @@ const Login = () => {
               </Form.Group>
               <Form.Group className="mb-3" controlId="formBasicPassword">
                 <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  value={payload.password}
-                  placeholder="Password"
-                  onChange={(e) =>
-                    setPayload({ ...payload, password: e.target.value })
-                  }
-                  required
-                />
+                <div style={{ position: "relative" }}>
+                  <Form.Control
+                    type={showLoginPassword ? "text" : "password"}
+                    value={payload.password}
+                    placeholder="Password"
+                    onChange={(e) =>
+                      setPayload({ ...payload, password: e.target.value })
+                    }
+                    required
+                  />
+                  <span
+                    variant="link"
+                    size="sm"
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      padding: 0,
+                    }}
+                    onClick={() => setShowLoginPassword((prev) => !prev)}
+                    tabIndex={-1}
+                  >
+                    {showLoginPassword ? (
+                      <FaEyeSlash color="black" />
+                    ) : (
+                      <FaEye color="black" />
+                    )}
+                  </span>
+                </div>
               </Form.Group>
+              {loginError && <p style={{ color: "red" }}>{loginError}</p>}
+              {loginSuccessMessage && (
+                <p style={{ color: "green" }}>{loginSuccessMessage}</p>
+              )}
               <Button variant="outline-primary" type="submit">
                 Login
               </Button>

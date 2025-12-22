@@ -1,23 +1,19 @@
-import {useState, lazy} from "react";
+import { useState } from "react";
 import "../styles/CertificateComponent.css";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import { FaFileAlt, FaHandHoldingHeart, FaPrint } from "react-icons/fa";
+import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
+import { FaFileAlt, FaHandHoldingHeart, FaPrint, FaBriefcase } from "react-icons/fa";
 
 //MUI imports
 import { Divider } from "@mui/material";
 import { Row, Col, Card, Button, Modal, Form } from "react-bootstrap";
 
-const ClearanceCertificate = lazy(() =>
-  import("../component/CertificatesComponent/ClearanceCertificate")
-);
-const IndigencyCertificate = lazy(() =>
-  import("../component/CertificatesComponent/IndigencyCertificate")
-);
+import ClearanceCertificate from "../component/CertificatesComponent/ClearanceCertificate";
+import IndigencyCertificate from "../component/CertificatesComponent/IndigencyCertificate";
+import WorkingPermit from "../component/CertificatesComponent/WorkingPermit";
 const CertificateComponent = ({ selectedResident }) => {
-
-    const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [certType, setCertType] = useState(""); // 'Indigency' or 'Clearance'
-  
+
   // Form Data
   const [purpose, setPurpose] = useState("");
   const [orNumber, setOrNumber] = useState("");
@@ -28,6 +24,33 @@ const CertificateComponent = ({ selectedResident }) => {
     setPurpose(""); // Reset fields
     setOrNumber("");
     setShowModal(true);
+  };
+
+  const renderDocument = (type) => {
+    if (type === "Indigency") {
+      return (
+        <IndigencyCertificate resident={selectedResident} purpose={purpose} />
+      );
+    }
+    if (type === "Clearance") {
+      return (
+        <ClearanceCertificate
+          resident={selectedResident}
+          purpose={purpose}
+
+        />
+      );
+    }
+
+    if (type === "WorkingPermit") {
+      return (
+        <WorkingPermit
+          resident={selectedResident}
+          purpose={purpose}
+ 
+        />
+      );
+    }
   };
 
   console.log("CertificateComponent selectedResident:", selectedResident);
@@ -47,7 +70,7 @@ const CertificateComponent = ({ selectedResident }) => {
         <div className="p-3">
           <h5 className="mb-4">Select Document to Generate</h5>
 
-          <Row>
+          <Row className="g-4">
             {/* OPTION 1: CLEARANCE */}
             <Col md={6}>
               <Card
@@ -70,7 +93,7 @@ const CertificateComponent = ({ selectedResident }) => {
             <Col md={6}>
               <Card
                 className="text-center p-4 shadow-sm h-100"
-                style={{ cursor: "pointer", border: "1px solid #198754" }}
+                style={{ cursor: "pointer", border: "1px solid #02b027ff" }}
                 onClick={() => handleOpen("Indigency")}
               >
                 <Card.Body>
@@ -83,83 +106,92 @@ const CertificateComponent = ({ selectedResident }) => {
                 </Card.Body>
               </Card>
             </Col>
+
+            <Col md={6}>
+              <Card
+                className="text-center p-4 shadow-sm h-100"
+                style={{ cursor: "pointer", border: "1px solid #ecdd06ff" }}
+                onClick={() => handleOpen("WorkingPermit")}
+              >
+                <Card.Body>
+                  <FaBriefcase size={40} className="text-warning mb-3" />
+                  <h4>Working Permit</h4>
+                  <p className="text-muted">
+                    For employment or business purposes.
+                  </p>
+                  <Button variant="outline-warning">Select</Button>
+                </Card.Body>
+              </Card>
+            </Col>
           </Row>
 
           {/* --- THE MINI MODAL (Just asks for Purpose) --- */}
-          <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+          <Modal
+            show={showModal}
+            onHide={() => setShowModal(false)}
+            centered
+            size="xl"
+          >
             <Modal.Header closeButton>
               <Modal.Title>Print {certType}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <Form>
-                <Form.Group className="mb-3">
-                  <Form.Label>Purpose</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="e.g. Employment, Medical Assistance"
-                    value={purpose}
-                    onChange={(e) => setPurpose(e.target.value)}
-                    autoFocus
-                  />
-                </Form.Group>
+              <Row>
+                {/* COLUMN 1: INPUT FORM */}
+                <Col md={4} style={{ borderRight: "1px solid #ddd" }}>
+                  <Form>
+                    {/* ... Your Form Inputs ... */}
+                    <Form.Group className="mb-3">
+                      <Form.Label>Purpose</Form.Label>
+                      <Form.Control
+                        value={purpose}
+                        onChange={(e) => setPurpose(e.target.value)}
+                        autoFocus
+                      />
+                    </Form.Group>
+                    {/* ... Other Inputs ... */}
+                  </Form>
 
-                {/* Only show O.R. / Amount if it is a Clearance */}
-                {certType === "Clearance" && (
-                  <Row>
-                    <Col>
-                      <Form.Label>O.R. Number</Form.Label>
-                      <Form.Control
-                        value={orNumber}
-                        onChange={(e) => setOrNumber(e.target.value)}
-                      />
-                    </Col>
-                    <Col>
-                      <Form.Label>Amount</Form.Label>
-                      <Form.Control
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                      />
-                    </Col>
-                  </Row>
-                )}
-              </Form>
-            </Modal.Body>
-            <Modal.Footer>
-              {/* DYNAMIC DOWNLOAD BUTTON */}
-              {purpose && (
-                <PDFDownloadLink
-                  document={
-                    certType === "Indigency" ? (
-                      <IndigencyCertificate
-                        resident={selectedResident}
-                        purpose={purpose}
-                      />
-                    ) : (
-                      <ClearanceCertificate
-                        resident={selectedResident}
-                        purpose={purpose}
-                        orNumber={orNumber}
-                        amount={amount}
-                      />
-                    )
-                  }
-                  fileName={`${certType}_${selectedResident.lastname}.pdf`}
-                  style={{ textDecoration: "none" }}
+                  <div className="d-grid gap-2 mt-4">
+                    {purpose && (
+                      <PDFDownloadLink
+                        document={renderDocument(certType)}
+                        fileName={`${certType}_${selectedResident.lastname}.pdf`}
+                        style={{ textDecoration: "none" }}
+                      >
+                        {({ loading }) => (
+                          <Button
+                            variant="primary"
+                            disabled={loading}
+                            className="w-100"
+                          >
+                            {loading ? (
+                              "Generating..."
+                            ) : (
+                              <>
+                                <FaPrint /> Download PDF
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </PDFDownloadLink>
+                    )}
+                  </div>
+                </Col>
+
+                {/* COLUMN 2: LIVE PREVIEW */}
+                <Col
+                  md={8}
+                  style={{ height: "600px", backgroundColor: "#f5f5f5" }}
                 >
-                  {({ blob, url, loading, error }) => (
-                    <Button variant="primary" disabled={loading}>
-                      {loading ? (
-                        "Generating..."
-                      ) : (
-                        <>
-                          <FaPrint className="me-2" /> Download PDF
-                        </>
-                      )}
-                    </Button>
-                  )}
-                </PDFDownloadLink>
-              )}
-            </Modal.Footer>
+                  {/* Note: Suspense removed as we are not using lazy anymore */}
+                  <PDFViewer width="100%" height="100%" showToolbar={false}>
+                    {/* FIX 1: Passed certType here */}
+                    {renderDocument(certType)}
+                  </PDFViewer>
+                </Col>
+              </Row>
+            </Modal.Body>
           </Modal>
         </div>
       </div>
