@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Form, Row, Col, Button, Container, Modal } from "react-bootstrap";
+import SnackbarComponent from "../SnackbarComponent";
 
 const UserManagement = () => {
   const [payload, setPayload] = useState({
@@ -11,11 +12,20 @@ const UserManagement = () => {
   });
   const [confirmPassword, setConfirmPassword] = useState("");
   const [openModal, setOpenModal] = useState(false);
+  const [pageStatus, setPageStatus] = useState("idle");
+  const [successSnackBarStatus, setSuccessSnackBarStatus] = useState(false);
+  const [failedSnackBarStatus, setFailedSnackBarStatus] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+
+    const handleSnackBarClose = (event, reason) => {
+    setSuccessSnackBarStatus(false);
+    setFailedSnackBarStatus(false);
+  };
+
   const API_URL = import.meta.env.VITE_API_URL;
   //check the password and the confirm password fields match
   const isPasswordValid = () => {
     if (payload.user_password !== confirmPassword) {
-
       return false;
     }
     return true;
@@ -32,19 +42,36 @@ const UserManagement = () => {
     try {
       const res = await fetch(`${API_URL}/api/users/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/json"  },
-        body: JSON.stringify(payload)
-    });
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    console.log("Response:", payload);
+      console.log("Response:", payload);
       if (res.ok) {
         const data = await res.json();
+        setPageStatus("success");
+        setSuccessSnackBarStatus(true);
+        setNotificationMessage("User registered successfully");
+        setPayload({
+          firstName: "",
+          lastName: "",
+          username: "",
+          user_password: "",
+          user_role: "",
+        });
+        setConfirmPassword("");
         console.log("User registered successfully:", data);
       } else {
         console.error("Failed to register user:", res.statusText);
+        setPageStatus("failed");
+        setFailedSnackBarStatus(true);
+        setNotificationMessage("Failed to register user");
       }
     } catch (error) {
       console.error("Error during user registration:", error);
+      setPageStatus("failed");
+      setFailedSnackBarStatus(true);
+      setNotificationMessage("An error occurred during registration");
     }
   };
   return (
@@ -177,29 +204,34 @@ const UserManagement = () => {
       </Container>
 
       {openModal && (
-
-      <Modal
-      show={openModal}
-      onHide={() => setOpenModal(false)}  
-      size="md"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-      </Modal.Header>
-      <Modal.Body>
-        <h4>Password do not Match</h4>
-        <p>
-          The password and confirm password fields do not match. Please try
-          again.
-        </p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={() =>setOpenModal(false)}>Close</Button>
-      </Modal.Footer>
-    </Modal>
+        <Modal
+          show={openModal}
+          onHide={() => setOpenModal(false)}
+          size="md"
+          aria-labelledby="contained-modal-title-vcenter"
+          centered
+        >
+          <Modal.Header closeButton></Modal.Header>
+          <Modal.Body>
+            <h4>Password do not Match</h4>
+            <p>
+              The password and confirm password fields do not match. Please try
+              again.
+            </p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={() => setOpenModal(false)}>Close</Button>
+          </Modal.Footer>
+        </Modal>
       )}
 
+            <SnackbarComponent
+        pageState={pageStatus}
+        notification={notificationMessage}
+        successSnackBarState={successSnackBarStatus}
+        failedSnackBarState={failedSnackBarStatus}
+        handleClose={handleSnackBarClose}
+      />
     </div>
   );
 };
