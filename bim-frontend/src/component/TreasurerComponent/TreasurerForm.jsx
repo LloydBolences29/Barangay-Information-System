@@ -8,6 +8,8 @@ import {
   Form,
   Container,
 } from "react-bootstrap";
+import { FaFileAlt, FaHandHoldingHeart, FaPrint, FaBriefcase } from "react-icons/fa";
+
 
 const TreasurerForm = () => {
   return (
