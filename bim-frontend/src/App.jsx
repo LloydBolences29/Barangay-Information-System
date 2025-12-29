@@ -13,6 +13,9 @@ function App() {
   const SecretaryPage = lazy(() => import("./pages/Secretary.jsx"));
   const CaptainPage = lazy(() => import("./pages/Captain.jsx"));
   const TreasurerPage = lazy(() => import("./pages/Treasurer.jsx"));
+  const TreasurerFormRenderer = lazy(() =>
+    import("./component/TreasurerFormRenderer.jsx")
+  );
   return (
     <>
       <AuthProvider>
@@ -21,10 +24,7 @@ function App() {
             <Routes>
               <Route path="/" element={<LoginForm />} />
 
-              <Route element={<ProtectedRoutes allowedRoles={["admin"]} />}>
-                <Route path="/user-management" element={<UserManagement />} />
-                <Route path="/admin" element={<AdminPage />} />
-              </Route>
+           
               <Route element={<ProtectedRoutes allowedRoles={["admin"]} />}>
                 <Route path="/user-management" element={<UserManagement />} />
                 <Route path="/admin" element={<AdminPage />} />
@@ -37,6 +37,7 @@ function App() {
               </Route>
               <Route element={<ProtectedRoutes allowedRoles={["treasurer"]} />}>
                 <Route path="/treasurer" element={<TreasurerPage />} />
+                <Route path="/treasurer/:id" element={<TreasurerFormRenderer />} />
               </Route>
             </Routes>
           </Suspense>
