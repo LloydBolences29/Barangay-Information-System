@@ -9,28 +9,42 @@ import {
   Container,
 } from "react-bootstrap";
 import { FaFileAlt, FaHandHoldingHeart, FaPrint, FaBriefcase } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 
 const TreasurerForm = () => {
+
+  const navigate = useNavigate();
+
+  const treasurerForms = [{
+    id: "punong-barangay-certification",
+    title: "Punong Barangay's Certification",
+    description: "For employment, ID, or general requirements.",
+    icon: <FaFileAlt size={40} className="text-primary mb-3" />,
+    onClick: () => navigate("/treasurer/punong-barangay-certification"),
+  }]
   return (
     <Container>
       <Row className="justify-content-md-center mt-5">
-        <Col md={6}>
+        {treasurerForms.map((form) => (
+          <Col md={6} className="mb-4" key={form.id}>
           <Card
             className="text-center p-4 shadow-sm h-100"
             style={{ cursor: "pointer", border: "1px solid #0d6efd" }}
-            onClick={() => handleOpen("Clearance")}
+            onClick={form.onClick}
           >
             <Card.Body>
-              <FaFileAlt size={40} className="text-primary mb-3" />
-              <h4>Punong Barangay's Certification</h4>
+              {form.icon}
+              <h4>{form.title}</h4>
               <p className="text-muted">
-                For employment, ID, or general requirements.
+                {form.description}
               </p>
               <Button variant="outline-primary">Select</Button>
             </Card.Body>
           </Card>
         </Col>
+        ))}
+        
       </Row>
     </Container>
   );

@@ -1,4 +1,4 @@
-import { useState } from "react";
+ import { useState } from "react";
 import "../styles/CertificateComponent.css";
 import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 import { FaFileAlt, FaHandHoldingHeart, FaPrint, FaBriefcase } from "react-icons/fa";
@@ -181,8 +181,7 @@ const CertificateComponent = ({ selectedResident }) => {
 
                 {/* COLUMN 2: LIVE PREVIEW */}
                 <Col
-                  md={8}
-                  style={{ height: "600px", backgroundColor: "#f5f5f5" }}
+                  style={{ width: "100%", height: "600px", backgroundColor: "#f5f5f5" }}
                 >
                   {/* Note: Suspense removed as we are not using lazy anymore */}
                   <PDFViewer width="100%" height="100%" showToolbar={false}>
