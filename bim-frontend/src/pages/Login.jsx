@@ -94,7 +94,7 @@ const Login = () => {
               className="splash-logo" 
               
             />
-            <h2 className="splash-text">Barangay Information System</h2>
+            <h2 className="splash-text">Barangay 35 Information System</h2>
           </div>
         </div>
       )}
@@ -104,7 +104,7 @@ const Login = () => {
       <Container id="login-main-container" className={splashFading ? "content-visible" : "content-hidden"}>
         
         <div id="welcome-header-text" className="text-center">
-          <h1>Barangay Information System</h1>
+          <h1>Barangay 35 Information System</h1>
           <p className="subtitle">Secure Management Portal</p>
         </div>
 
