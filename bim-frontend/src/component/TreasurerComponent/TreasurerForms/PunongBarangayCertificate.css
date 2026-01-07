@@ -1,3 +1,104 @@
-.punong-barangay-certificate-container{
-    margin: 2rem;
+/* --- Global Layout --- */
+#pbc-body {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    padding: 2rem 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* --- Header Section --- */
+.pbc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header-text h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #0d2c3a;
+    margin-bottom: 0.2rem;
+}
+
+.header-text p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.action-btn-main {
+    background-color: #007f98;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.action-btn-main:hover {
+    background-color: #005f73;
+}
+
+/* --- Main Card Container --- */
+.pbc-card {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    overflow: hidden; /* Ensures corners clip correctly */
+}
+
+/* --- Table Styling --- */
+.custom-table {
+    margin-bottom: 0; /* Remove default bootstrap margin */
+}
+
+.custom-table thead th {
+    background-color: #f1f3f5;
+    color: #495057;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.custom-table tbody td {
+    padding: 1rem;
+    color: #343a40;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #f1f3f5;
+}
+
+.custom-table tbody tr:hover {
+    background-color: #f8fcfd; /* Very subtle blue highlight */
+}
+
+/* Empty State */
+.empty-state {
+    padding: 3rem !important;
+}
+
+/* --- Footer / Total Section --- */
+.pbc-card-footer {
+    background-color: #ffffff;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.total-label {
+    font-size: 1rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.total-value {
+    font-size: 1.8rem;
+    color: #007f98;
+    font-weight: 700;
 }

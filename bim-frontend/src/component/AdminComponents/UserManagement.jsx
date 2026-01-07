@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Form, Row, Col, Button, Container, Modal } from "react-bootstrap";
-import SnackbarComponent from "../SnackbarComponent";
+import { Form, Row, Col, Button, Container, Modal, Card, FloatingLabel } from "react-bootstrap";
+import { AiOutlineUserAdd, AiOutlineWarning } from "react-icons/ai";
+import SnackbarComponent from "../SnackbarComponent"; // Adjust path if needed
+import "./UserManagement.css"; // Create this CSS file
 
 const UserManagement = () => {
   const [payload, setPayload] = useState({
@@ -17,28 +19,24 @@ const UserManagement = () => {
   const [failedSnackBarStatus, setFailedSnackBarStatus] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
 
-    const handleSnackBarClose = (event, reason) => {
+  const handleSnackBarClose = (event, reason) => {
     setSuccessSnackBarStatus(false);
     setFailedSnackBarStatus(false);
   };
 
   const API_URL = import.meta.env.VITE_API_URL;
-  //check the password and the confirm password fields match
+
   const isPasswordValid = () => {
-    if (payload.user_password !== confirmPassword) {
-      return false;
-    }
-    return true;
+    return payload.user_password === confirmPassword;
   };
 
-  //validate form inputs and handle form submission here
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isPasswordValid()) {
       setOpenModal(true);
       return;
     }
-    // Handle user registration logic here
+    
     try {
       const res = await fetch(`${API_URL}/api/users/register`, {
         method: "POST",
@@ -46,7 +44,6 @@ const UserManagement = () => {
         body: JSON.stringify(payload),
       });
 
-      console.log("Response:", payload);
       if (res.ok) {
         const data = await res.json();
         setPageStatus("success");
@@ -60,12 +57,10 @@ const UserManagement = () => {
           user_role: "",
         });
         setConfirmPassword("");
-        console.log("User registered successfully:", data);
       } else {
-        console.error("Failed to register user:", res.statusText);
         setPageStatus("failed");
         setFailedSnackBarStatus(true);
-        setNotificationMessage("Failed to register user");
+        setNotificationMessage("Failed to register user. Please try again.");
       }
     } catch (error) {
       console.error("Error during user registration:", error);
@@ -74,116 +69,100 @@ const UserManagement = () => {
       setNotificationMessage("An error occurred during registration");
     }
   };
+
   return (
-    <div>
-      <Container id="register-main-container">
-        <div id="welcome-header-text">
-          <h1>Welcome to Your System</h1>
+    <div id="register-body">
+      <Container className="d-flex flex-column align-items-center">
+        
+        {/* Header Section */}
+        <div className="register-header text-center mb-4">
+          <h1>System Access Management</h1>
+          <p className="text-muted">Create new accounts for administrators and staff members</p>
         </div>
 
-        <div id="register-container">
-          <div>
-            <h2>Register</h2>
-          </div>
-
-          <div>
+        {/* Main Form Card */}
+        <Card className="register-card shadow-lg">
+          <Card.Body className="p-5">
+            <div className="form-title mb-4">
+                <AiOutlineUserAdd size={28} className="me-2 text-primary-custom" />
+                <h3 className="m-0">Register New User</h3>
+            </div>
+            
             <Form onSubmit={handleSubmit}>
-              <Row sm={1} md={2} lg={2}>
-                <Col>
-                  <Form.Group className="mb-3" controlId="formBasicFirstname">
-                    <Form.Label>First Name</Form.Label>
+              <Row>
+                <Col md={6}>
+                  <FloatingLabel controlId="floatingFirst" label="First Name" className="mb-3">
                     <Form.Control
                       type="text"
-                      placeholder="Enter first name"
+                      placeholder="First Name"
                       value={payload.firstName}
-                      onChange={(e) => {
-                        setPayload({ ...payload, firstName: e.target.value });
-                      }}
+                      onChange={(e) => setPayload({ ...payload, firstName: e.target.value })}
                       required
                     />
-                  </Form.Group>
+                  </FloatingLabel>
                 </Col>
-                <Col>
-                  <Form.Group className="mb-3" controlId="formBasicLastname">
-                    <Form.Label>Last Name</Form.Label>
+                <Col md={6}>
+                  <FloatingLabel controlId="floatingLast" label="Last Name" className="mb-3">
                     <Form.Control
                       type="text"
-                      placeholder="Enter Last name"
+                      placeholder="Last Name"
                       value={payload.lastName}
-                      onChange={(e) => {
-                        setPayload({ ...payload, lastName: e.target.value });
-                      }}
+                      onChange={(e) => setPayload({ ...payload, lastName: e.target.value })}
                       required
                     />
-                  </Form.Group>
+                  </FloatingLabel>
                 </Col>
               </Row>
+
               <Row>
-                <Col>
-                  <Form.Group className="mb-3" controlId="formBasicUsername">
-                    <Form.Label>Username</Form.Label>
+                <Col md={6}>
+                  <FloatingLabel controlId="floatingUsername" label="Username" className="mb-3">
                     <Form.Control
                       type="text"
-                      placeholder="Enter Username"
+                      placeholder="Username"
                       value={payload.username}
-                      onChange={(e) => {
-                        setPayload({ ...payload, username: e.target.value });
-                      }}
+                      onChange={(e) => setPayload({ ...payload, username: e.target.value })}
                       required
                     />
-                  </Form.Group>
+                  </FloatingLabel>
                 </Col>
-                <Col>
-                  <Form.Group className="mb-3" controlId="formBasicRole">
-                    <Form.Label>Role</Form.Label>
+                <Col md={6}>
+                  <FloatingLabel controlId="floatingRole" label="Assign Role" className="mb-3">
                     <Form.Select
-                      aria-label="Default select example"
                       value={payload.user_role}
-                      onChange={(e) => {
-                        setPayload({ ...payload, user_role: e.target.value });
-                      }}
+                      onChange={(e) => setPayload({ ...payload, user_role: e.target.value })}
                       required
                     >
-                      <option value="">Select Role</option>
-                      <option value="admin">Admin</option>
+                      <option value="">Select Role...</option>
+                      <option value="admin">Administrator</option>
                       <option value="captain">Barangay Captain</option>
                       <option value="secretary">Barangay Secretary</option>
+                      <option value="treasurer">Barangay Treasurer</option>
                       <option value="clerk">Barangay Clerk</option>
                       <option value="tanod">Barangay Tanod</option>
-                      <option value="treasurer">Barangay Treasurer</option>
-                      <option value="health_worker">
-                        Barangay Health Worker
-                      </option>
-                      <option value="sk_chairman">Barangay SK Chairman</option>
+                      <option value="health_worker">Health Worker</option>
+                      <option value="sk_chairman">SK Chairman</option>
                     </Form.Select>
-                  </Form.Group>
+                  </FloatingLabel>
                 </Col>
               </Row>
 
+              <hr className="my-4" />
+
               <Row>
-                <Col>
-                  <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Label>Password</Form.Label>
+                <Col md={6}>
+                  <FloatingLabel controlId="floatingPassword" label="Password" className="mb-3">
                     <Form.Control
                       type="password"
-                      placeholder="Enter Password"
+                      placeholder="Password"
                       value={payload.user_password}
-                      onChange={(e) => {
-                        setPayload({
-                          ...payload,
-                          user_password: e.target.value,
-                        });
-                      }}
+                      onChange={(e) => setPayload({ ...payload, user_password: e.target.value })}
                       required
                     />
-                  </Form.Group>
+                  </FloatingLabel>
                 </Col>
-                <Col>
-                  <Form.Group
-                    className="mb-3"
-                    controlId="formBasicConfirmPassword"
-                  >
-                    <Form.Label>Confirm Password</Form.Label>
+                <Col md={6}>
+                  <FloatingLabel controlId="floatingConfirm" label="Confirm Password" className="mb-3">
                     <Form.Control
                       type="password"
                       placeholder="Confirm Password"
@@ -191,41 +170,42 @@ const UserManagement = () => {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                     />
-                  </Form.Group>
+                  </FloatingLabel>
                 </Col>
               </Row>
 
-              <Button variant="outline-primary" type="submit">
-                Add User
-              </Button>
+              <div className="d-grid gap-2 mt-4">
+                <Button className="btn-register" size="lg" type="submit">
+                  Create Account
+                </Button>
+              </div>
             </Form>
-          </div>
-        </div>
+          </Card.Body>
+        </Card>
       </Container>
 
-      {openModal && (
-        <Modal
-          show={openModal}
-          onHide={() => setOpenModal(false)}
-          size="md"
-          aria-labelledby="contained-modal-title-vcenter"
-          centered
-        >
-          <Modal.Header closeButton></Modal.Header>
-          <Modal.Body>
-            <h4>Password do not Match</h4>
-            <p>
-              The password and confirm password fields do not match. Please try
-              again.
+      {/* Error Modal */}
+      <Modal
+        show={openModal}
+        onHide={() => setOpenModal(false)}
+        centered
+        className="error-modal"
+      >
+        <Modal.Body className="text-center p-4">
+            <div className="text-warning mb-3">
+                <AiOutlineWarning size={50} />
+            </div>
+            <h4>Password Mismatch</h4>
+            <p className="text-muted">
+                The password and confirm password fields do not match. Please try again.
             </p>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button onClick={() => setOpenModal(false)}>Close</Button>
-          </Modal.Footer>
-        </Modal>
-      )}
+            <Button variant="secondary" onClick={() => setOpenModal(false)}>
+                Close
+            </Button>
+        </Modal.Body>
+      </Modal>
 
-            <SnackbarComponent
+      <SnackbarComponent
         pageState={pageStatus}
         notification={notificationMessage}
         successSnackBarState={successSnackBarStatus}

@@ -287,65 +287,70 @@ const ResidentManagement = () => {
 
   return (
     <>
-      <div id="ris-body">
+<div id="ris-body">
         <div id="header-title">
-          <h1> Resident Information System</h1>
+          <h1>Resident Information System</h1>
         </div>
 
-        <div className="container">
+        <div className="container-fluid px-4">
           <div id="ris-main-wrapper">
+            
+            {/* --- FIXED HEADER SECTION --- */}
             <div id="ris-actions">
+              
+              {/* LEFT SIDE: Search */}
               <div id="search-actions">
                 <input
                   id="search-input"
                   type="text"
-                  placeholder="Search Resident..."
+                  placeholder="Search resident name..."
                   onChange={handleSearchInput}
                 />
                 <Button
-                  variant="outline-primary"
-                  className="rounded-pill px-3"
-                  size="sm"
+                  variant="primary" // Changed to filled primary for better visibility
+                  className="rounded-pill px-4"
                   onClick={() => handleSearchResident(searchTerm)}
                 >
                   Search
                 </Button>
               </div>
-              <div id="filter-actions">
-                <select
-                  id="filter-input"
-                  value={filterStatus}
-                  onChange={handleFilterChange}
-                  className="form-select"
-                >
-                  <option value="active">Active</option>
-                  <option value="all">All</option>
-                  <option value="inactive">Deleted</option>
-                  <option value="deceased">Deceased</option>
-                  <option value="moved out">Moved Out</option>
-                </select>
-                {/* <Button
-                  variant="outline-primary"
-                  className="rounded-pill px-3"
-                  size="sm"
-                >
-                  Filter
-                </Button> */}
-              </div>
-              {auth.user === "secretary" && (
-                <div id="action-buttons">
-                  <Button
-                    variant="outline-primary"
-                    className="rounded-pill px-3"
-                    size="sm"
-                    onClick={handleOpenModal}
+
+              {/* RIGHT SIDE: Filter & Add Button grouped together */}
+              <div className="d-flex gap-3 align-items-center flex-row justify-content-end">
+                
+                {/* Filter Dropdown */}
+                <div id="filter-actions">
+                  <select
+                    id="filter-input"
+                    value={filterStatus}
+                    onChange={handleFilterChange}
+                    className="form-select"
                   >
-                    Add Resident
-                  </Button>
+                    <option value="active">Status: Active</option> {/* Added label context */}
+                    <option value="all">Status: All</option>
+                    <option value="inactive">Status: Deleted</option>
+                    <option value="deceased">Status: Deceased</option>
+                    <option value="moved out">Status: Moved Out</option>
+                  </select>
                 </div>
-              )}
+
+                {/* Add Button */}
+                {auth.user === "secretary" && (
+                  <div id="action-buttons">
+                    <Button
+                      variant="outline-primary"
+                      className="rounded-pill px-4 fw-bold"
+                      onClick={handleOpenModal}
+                    >
+                      + Add Resident
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
-            <Suspense fallback={<div>Loading...</div>}>
+            {/* --- END FIXED HEADER --- */}
+
+            <Suspense fallback={<div className="text-center p-5">Loading Residents...</div>}>
               <ResidentInformationTable searchError={searchErrorMessage} />
             </Suspense>
           </div>

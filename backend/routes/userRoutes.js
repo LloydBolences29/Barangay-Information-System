@@ -167,4 +167,32 @@ router.post("/logout", async (req, res) => {
   }
 });
 
+router.patch("/update-user/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { firstName, lastName, username, user_role, is_active } = req.body;
+
+    const db = await connectToDatabase();
+    const sql =
+      "UPDATE user_info SET firstname = ?, lastname = ?, username = ?, user_role = ?, is_active = ? WHERE id = ?";
+    const [result] = await db.execute(sql, [
+      firstName,
+      lastName,
+      username,
+      user_role,
+      is_active,
+      id,
+    ]);
+
+    return res
+      .status(200)
+      .json({ message: "User updated successfully" });
+  } catch (error) {
+    console.error("Error during updating user:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error. Please contact your admin" });
+  }
+})
+
 module.exports = router;

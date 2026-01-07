@@ -1,0 +1,102 @@
+/* --- Background & Layout --- */
+#treasurer-dashboard-bg {
+  min-height: 100vh;
+  background-color: #f8f9fa; /* Consistent light gray background */
+  padding: 3rem 0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* --- Header Section --- */
+.treasurer-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.treasurer-header h1 {
+  color: #0d2c3a;
+  font-weight: 700;
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.treasurer-header p {
+  color: #6c757d;
+  font-size: 1.1rem;
+}
+
+/* --- Service Card Design --- */
+.service-card {
+  border: none; /* Removed the harsh blue border */
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* Soft shadow */
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Hover Effect: Lift up and glow */
+.service-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(0, 127, 152, 0.15); /* Teal glow */
+}
+
+/* --- Icon Styling --- */
+.icon-wrapper {
+  width: 80px;
+  height: 80px;
+  background-color: #e0f2f1; /* Light teal background */
+  border-radius: 50%; /* Circle shape */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.service-icon {
+  color: #007f98; /* Brand Teal color */
+  transition: color 0.3s ease;
+}
+
+/* Change icon colors on hover */
+.service-card:hover .icon-wrapper {
+  background-color: #007f98;
+}
+
+.service-card:hover .service-icon {
+  color: #ffffff;
+}
+
+/* --- Typography --- */
+.service-title {
+  color: #344767;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  font-size: 1.25rem;
+}
+
+.service-desc {
+  color: #8898aa;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+/* --- Button Styling --- */
+.service-btn {
+  background-color: transparent;
+  color: #007f98;
+  border: 1px solid #007f98;
+  border-radius: 50px;
+  padding: 0.5rem 2rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.service-card:hover .service-btn {
+  background-color: #007f98;
+  color: #ffffff;
+}
