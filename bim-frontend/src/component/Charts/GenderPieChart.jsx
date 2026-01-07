@@ -1,6 +1,6 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Card, Typography, Box } from '@mui/material';
+import { Typography, Box } from '@mui/material';
 
 const GenderPieChart = ({ maleCount, femaleCount }) => {
   
@@ -10,15 +10,14 @@ const GenderPieChart = ({ maleCount, femaleCount }) => {
     { name: 'Female', value: femaleCount },
   ];
 
-  // 2. Define Colors (Blue for Male, Pink/Red for Female)
+  // 2. Define Colors
   const COLORS = ['#1976d2', '#e91e63']; 
 
-  // Custom Tooltip to make it look nice
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>
-          <p style={{ margin: 0 }}>{`${payload[0].name}: ${payload[0].value}`}</p>
+        <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }}>
+          <p style={{ margin: 0, fontWeight: 'bold' }}>{`${payload[0].name}: ${payload[0].value}`}</p>
         </div>
       );
     }
@@ -26,22 +25,26 @@ const GenderPieChart = ({ maleCount, femaleCount }) => {
   };
 
   return (
-    <Card sx={{ p: 3, height: 400, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <Typography variant="h6" gutterBottom>
+    // REMOVED <Card>: We use a Box that fills 100% of the parent CSS container
+    <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      
+      <Typography variant="h6" gutterBottom style={{ marginBottom: '10px' }}>
         Population by Sex
       </Typography>
       
-      <Box sx={{ width: '100%', height: '100%' }}>
-        <ResponsiveContainer>
+      {/* ResponsiveContainer needs a parent with defined height to work. 
+          Our CSS .pie-chart-container provides that height. */}
+      <div style={{ width: '100%', flexGrow: 1, minHeight: 0 }}>
+        <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={data}
-              cx="50%" // Center X
-              cy="50%" // Center Y
-              innerRadius={60} // Makes it a Donut (Hollow center)
-              outerRadius={100}
+              cx="50%"
+              cy="50%"
+              innerRadius={60}
+              outerRadius={80} // Reduced slightly to prevent clipping on small screens
               fill="#8884d8"
-              paddingAngle={2} // Slight gap between slices
+              paddingAngle={5}
               dataKey="value"
             >
               {data.map((entry, index) => (
@@ -49,11 +52,11 @@ const GenderPieChart = ({ maleCount, femaleCount }) => {
               ))}
             </Pie>
             <Tooltip content={<CustomTooltip />} />
-            <Legend verticalAlign="bottom" height={36}/>
+            <Legend verticalAlign="bottom" height={36} iconType="circle"/>
           </PieChart>
         </ResponsiveContainer>
-      </Box>
-    </Card>
+      </div>
+    </Box>
   );
 };
 

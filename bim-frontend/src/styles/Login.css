@@ -1,14 +1,244 @@
-#login-main-container{
-    height: 100vh;
-    display: flex;
-    gap: 3em;
-    flex-direction: column;
-    justify-content: center;
+/* --- Global & Layout --- */
+.login-background {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  background-color: #f8fcfd; /* Very light teal/white */
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-@media only screen and (max-width: 768px){
-    #login-main-container{
+/* The Grid Pattern */
+.login-background::before {
+   content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  
+  /* Creates the subtle grid pattern */
+  background-image: 
+    linear-gradient(to right, #007F98 1px, transparent 1px),
+    linear-gradient(to bottom, #007F98 1px, transparent 1px);
+  background-size: 15px 15px;
 
-    }
+  /* Creates the fade effect, centered on the left */
+  mask-image: radial-gradient(circle at center, transparent 70%, rgba(0,0,0,-0.3) 50%, rgba(0,0,0,0.5) 90%, black 80%);
+  -webkit-mask-image: radial-gradient(circle at center, transparent 70%, rgba(0,0,0,-0.3) 50%, rgba(0,0,0,0.5) 90%, black 80%);
+}
 
+#login-main-container {
+  position: relative;
+  z-index: 1; /* Ensures content sits above the grid */
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 500px; /* Constraints width for better readability */
+}
+
+/* --- Typography --- */
+#welcome-header-text h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #0d2c3a;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+#welcome-header-text .subtitle {
+  font-size: 1.1rem;
+  color: #5d7480;
+  font-weight: 400;
+}
+
+/* --- The Login Card --- */
+.login-card {
+  background: #ffffff;
+  width: 100%;
+  padding: 2.5rem;
+  border-radius: 16px;
+  /* Soft, professional shadow */
+  box-shadow: 0 10px 40px rgba(13, 44, 58, 0.1); 
+  border-top: 5px solid #007f98; /* Brand accent color on top */
+}
+
+.login-card-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-card-header h2 {
+  color: #0d2c3a;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.login-card-header p {
+  color: #8898aa;
+  font-size: 0.9rem;
+}
+
+/* --- Form Elements --- */
+.custom-input {
+  height: 50px;
+  border-radius: 8px;
+  border: 1px solid #e0e6ed;
+  padding-left: 15px;
+  background-color: #fcfdfe;
+  transition: all 0.3s ease;
+}
+
+.custom-input:focus {
+  border-color: #007f98;
+  box-shadow: 0 0 0 4px rgba(0, 127, 152, 0.1);
+  background-color: #fff;
+}
+
+Form.Label {
+  font-weight: 600;
+  color: #344767;
+  font-size: 0.9rem;
+}
+
+/* Password Eye Icon Wrapper */
+.password-wrapper {
+  position: relative;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #8898aa;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle-icon:hover {
+  color: #007f98;
+}
+
+/* --- Buttons & Alerts --- */
+.login-btn {
+  height: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 8px;
+  background-color: #007f98;
+  border: none;
+  transition: background-color 0.2s;
+  margin-top: 10px;
+}
+
+.login-btn:hover {
+  background-color: #006072;
+}
+
+.alert-message {
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.alert-message.error {
+  background-color: #fdeded;
+  color: #ef5350;
+  border: 1px solid #f9c2c2;
+}
+
+.alert-message.success {
+  background-color: #edf7ed;
+  color: #4caf50;
+  border: 1px solid #c3e6cb;
+}
+
+.splash-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #feffff; /* Same background color as your login page */
+  z-index: 9999; /* Ensure it sits on top of everything */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.8s ease-in-out, visibility 0.8s;
+}
+
+/* This class is added by React to fade it out */
+.splash-overlay.fade-out {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.splash-content {
+  text-align: center;
+}
+
+/* Logo Animation (Pulse) */
+.splash-logo {
+
+  width: clamp(300px, 35vw, 600px);
+  
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 1.5rem;
+  
+  /* Keeps the pulse animation */
+  animation: logoPulse 2.5s infinite ease-in-out;
+}
+
+.splash-text {
+  color: #0d2c3a; /* Darker Navy color for better contrast */
+  font-size: clamp(1.5rem, 4vw, 2.5rem); /* Makes text dynamic too! */
+  font-weight: 700;
+  opacity: 0;
+  animation: fadeInUp 1s ease-out forwards;
+  animation-delay: 0.5s;
+}
+
+/* --- MAIN CONTENT ENTRANCE ANIMATIONS --- */
+
+/* Initially hidden slightly downwards */
+.content-hidden {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+/* Slide up and Fade in when splash disappears */
+.content-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+/* --- KEYFRAMES --- */
+
+@keyframes logoPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
