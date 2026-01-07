@@ -335,7 +335,7 @@ const ResidentManagement = () => {
                 </div>
 
                 {/* Add Button */}
-                {auth.user === "secretary" && (
+                {auth.user.role === "secretary" && (
                   <div id="action-buttons">
                     <Button
                       variant="outline-primary"

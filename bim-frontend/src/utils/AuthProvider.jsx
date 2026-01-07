@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
     loading: true,
     isAuthenticated: false,
     user: null,
+    is_first_logged_in: null,
   });
 
   const VITE_API_URL = import.meta.env.VITE_API_URL;
@@ -19,17 +20,19 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         const res = await response.json();
-        console.log("Authenticated user:", res.user.role);
+        console.log("Authenticated user:", res.user);
         setAuth({
           loading: false,
           isAuthenticated: true,
-          user: res.user.role,
+          user: res.user,
+          is_first_logged_in: res.user.is_first_logged_in,
         });
       } else {
         setAuth({
           loading: false,
           isAuthenticated: false,
           user: null,
+          is_first_logged_in: null,
         });
       }
     } catch (error) {
@@ -38,6 +41,7 @@ export const AuthProvider = ({ children }) => {
         loading: false,
         isAuthenticated: false,
         user: null,
+        is_first_logged_in: null,
       });
     }
   };

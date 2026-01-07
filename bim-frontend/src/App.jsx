@@ -16,6 +16,10 @@ function App() {
   const TreasurerFormRenderer = lazy(() =>
     import("./component/TreasurerFormRenderer.jsx")
   );
+
+  const ChangePassword = lazy(() =>
+    import("./pages/ChangePassword.jsx")
+  );
   return (
     <>
       <AuthProvider>
@@ -28,6 +32,9 @@ function App() {
               <Route element={<ProtectedRoutes allowedRoles={["admin"]} />}>
                 <Route path="/user-management" element={<UserManagement />} />
                 <Route path="/admin" element={<AdminPage />} />
+              </Route>
+              <Route element={<ProtectedRoutes allowedRoles={["admin", "captain", "secretary", "treasurer"]} />}>
+                <Route path="/change-password" element={<ChangePassword />} />
               </Route>
               <Route element={<ProtectedRoutes allowedRoles={["captain"]} />}>
                 <Route path="/captain" element={<CaptainPage />} />

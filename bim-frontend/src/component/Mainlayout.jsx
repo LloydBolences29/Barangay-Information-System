@@ -33,7 +33,7 @@ const Mainlayout = ({ children, activeComponent: activeComponentOverride, setAct
   // DEFINE MENU ITEMS
   let componentsRender = [];
 
-  switch (auth.user) {
+  switch (auth.user.role) {
     case "admin":
       componentsRender = [
         { id: "admin-dashboard", label: "Admin Dashboard", componentToBeRendered: <AdminDashboard /> },
@@ -129,7 +129,7 @@ const Mainlayout = ({ children, activeComponent: activeComponentOverride, setAct
             <div id="sidebar-profile-wrapper">
               <div id="welcome-banner">
                 {/* Fixed capitalization logic */}
-                <h2>Welcome, {auth.user ? `${auth.user.charAt(0).toUpperCase() + auth.user.slice(1)} user` : 'User'}</h2>
+                <h2>Welcome, {auth.user ? `${auth.user.role.charAt(0).toUpperCase() + auth.user.role.slice(1)} user` : 'User'}</h2>
               </div>
               <div id="action-buttons">
                 <Button variant="outline-secondary" size="sm" onClick={handleLogout}>

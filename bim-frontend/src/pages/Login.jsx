@@ -58,11 +58,19 @@ const Login = () => {
         setPayload({ username: "", password: "" });
         setLoginError("");
         setLoginSuccessMessage("Login successful! Redirecting...");
+
+        console.log("Login successful:", res.user); 
+
         setTimeout(() => {
           setLoginSuccessMessage("");
-          setAuth({ loading: false, isAuthenticated: true, user: res.user.role });
+          setAuth({ loading: false, isAuthenticated: true, user: res.user, is_first_logged_in: res.user.is_first_logged_in });
+
+          if (res.user.is_first_logged_in) {
+            navigate("/change-password");
+            return;
+          }
           
-          switch (res.user.role) {
+          switch (res.user?.role) {
             case "admin": navigate("/admin"); break;
             case "captain": navigate("/captain"); break;
             case "secretary": navigate("/secretary"); break;

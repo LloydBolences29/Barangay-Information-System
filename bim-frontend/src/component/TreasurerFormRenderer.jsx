@@ -23,7 +23,7 @@ const TreasurerFormRenderer = () => {
   return (
     <Mainlayout
       user_name={`${
-        auth.user.charAt(0).toUpperCase() + auth.user.slice(1)
+        auth.user.role.charAt(0).toUpperCase() + auth.user.role.slice(1)
       } user`}
       activeComponent={"treasurer-form"}
       setActiveComponent={() => {}}

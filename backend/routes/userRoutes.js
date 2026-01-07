@@ -22,6 +22,11 @@ router.post("/login", async (req, res) => {
     const sql = "SELECT * FROM user_info WHERE username = ?";
     const [rows] = await db.execute(sql, [username]);
 
+    //check if the user is active or not
+    if(rows.length > 0 && rows[0].is_active === 0) {
+      return res.status(403).json({ message: "User account is inactive. Please contact your administrator." });
+    }
+
     if (rows.length === 0) {
       return res.status(401).json({ message: "Invalid username" });
     }
@@ -37,7 +42,7 @@ router.post("/login", async (req, res) => {
 
     // If login is successful, generate a JWT token
     const token = jwt.sign(
-      { userId: user.id, role: user.user_role },
+      { id: user.id, username: user.username, role: user.user_role, is_first_logged_in: user.is_first_logged_in },
       JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -51,7 +56,7 @@ router.post("/login", async (req, res) => {
     }); // 1 hour
     return res.status(200).json({
       message: "Login successful",
-      user: { id: user.id, username: user.username, role: user.user_role },
+      user: { id: user.id, username: user.username, role: user.user_role, is_first_logged_in: user.is_first_logged_in },
     });
   } catch (error) {
     console.error("Error during user login:", error);
@@ -74,12 +79,13 @@ router.post("/register", async (req, res) => {
     const db = await connectToDatabase();
 
     const userCheckSql =
-      "SELECT * FROM user_info WHERE firstname = ? AND lastname = ? AND username = ? AND user_role = ?";
+      "SELECT * FROM user_info WHERE firstname = ? AND lastname = ? AND username = ? AND user_role AND is_first_logged_in = ?";
     const [existingUsers] = await db.execute(userCheckSql, [
       firstName,
       lastName,
       username,
       user_role,
+      1
     ]);
 
     if (existingUsers.length > 0) {
@@ -121,6 +127,7 @@ router.get("/auth", async (req, res) => {
         id: decoded.id,
         username: decoded.username,
         role: decoded.role,
+        is_first_logged_in: decoded.is_first_logged_in,
       },
     });
   } catch (error) {
@@ -128,6 +135,42 @@ router.get("/auth", async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 });
+
+router.post("/change-password", async(req, res)=>{
+  try {
+    const { id, newPassword } = req.body;
+    const db = await connectToDatabase();
+
+    // Hash the new password before storing it
+    const salt = bcyrpt.genSaltSync(10);
+    const hashedPassword = bcyrpt.hashSync(newPassword, salt);
+    const sql = "UPDATE user_info SET user_password = ?, is_first_logged_in = ? WHERE id = ?";
+    const [result] = await db.execute(sql, [hashedPassword, 0, id]);
+
+    return res.status(200).json({ message: "Password changed successfully", result: result });
+  } catch (error) {
+    console.log("Error changing password:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+})
+
+router.patch("/reset-password", async(req, res)=>{
+  try {
+    const { id, newPassword } = req.body;
+    const db = await connectToDatabase();
+
+    // Hash the new password before storing it
+    const salt = bcyrpt.genSaltSync(10);
+    const hashedPassword = bcyrpt.hashSync(newPassword, salt);
+    const sql = "UPDATE user_info SET user_password = ?, is_first_logged_in = ? WHERE id = ?";
+    const [result] = await db.execute(sql, [hashedPassword, 1, id]);
+
+    return res.status(200).json({ message: "Password reset successfully", result: result });
+  } catch (error) {
+    console.log("Error resetting password:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+})
 
 router.get("/get-all-users", async (req, res) => {
   try {

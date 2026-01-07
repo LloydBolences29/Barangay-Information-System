@@ -27,16 +27,34 @@ const AdminDashboard = () => {
     username: "",
     user_role: "",
     is_active: 1,
+    reset_password: "",
   });
   const [pageStatus, setPageStatus] = useState("idle");
   const [successSnackBarStatus, setSuccessSnackBarStatus] = useState(false);
   const [failedSnackBarStatus, setFailedSnackBarStatus] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
+  const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
 
   const handleSnackBarClose = (event, reason) => {
     setSuccessSnackBarStatus(false);
     setFailedSnackBarStatus(false);
   };
+
+  const handleOpenResetPasswordModal = () => {
+    console.log("Opening reset password modal for user:", selectedUser);
+    setShowEditModal(false);
+    setTimeout(()=>{
+    setShowResetPasswordModal(true);
+    }, 500)
+  }
+
+  const handleCloseResetPasswordModal = () => {
+    console.log("Closing reset password modal", selectedUser);
+    setShowResetPasswordModal(false);
+    setTimeout(()=>{
+      setShowEditModal(true);
+    }, 500)
+  }
 
   const fetchAllUsers = async () => {
     try {
@@ -59,6 +77,7 @@ const AdminDashboard = () => {
   // --- Handlers ---
 
   const handleEditClick = (user) => {
+    console.log("Editing user:", user);
     setSelectedUser(user);
     setEditFormData({
       firstname: user.firstname,
@@ -84,6 +103,8 @@ const AdminDashboard = () => {
   };
 
   const handleSaveChanges = async () => {
+    console.log("Saving changes for user:", selectedUser);
+    if (!selectedUser) return;
 
     const payload = {
       firstName: editFormData.firstname, // Map lowercase state to CamelCase backend expectation
@@ -142,6 +163,52 @@ const AdminDashboard = () => {
       setFailedSnackBarStatus(true);
     }
   };
+
+
+  const handleResetPassword = async () => {
+    console.log("Resetting password for user:", selectedUser);
+    if (!selectedUser) return;
+    const payload = {
+      id: selectedUser.id,
+      newPassword: editFormData.reset_password,
+    }
+
+    try {
+      const response = await fetch(
+        `${VITE_API_URL}/api/users/reset-password`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        setPageStatus("success");
+        setNotificationMessage(data.message);
+        setSuccessSnackBarStatus(true);
+        handleCloseResetPasswordModal();
+        setEditFormData((prev)=>({
+          ...prev,
+          reset_password: "",
+        }));
+      }else{
+        setPageStatus("error");
+        setNotificationMessage(data.message);
+        setFailedSnackBarStatus(true);
+        console.error("Reset password failed:", data.message);
+      }
+      
+    } catch (error) {
+      console.error("Failed to reset password", error);
+      setPageStatus("error");
+      setNotificationMessage("An error occurred while connecting to the server.");
+      setFailedSnackBarStatus(true);
+    }
+  }
 
   return (
     <div id="admin-dashboard-body">
@@ -285,7 +352,7 @@ const AdminDashboard = () => {
               </Col>
             </Row>
             <Row>
-              <Col md={12}>
+              <Col md={6}>
                 <FloatingLabel
                   controlId="floatingStatus"
                   label="Account Status"
@@ -300,6 +367,9 @@ const AdminDashboard = () => {
                   </Form.Select>
                 </FloatingLabel>
               </Col>
+              <Col md={6}>
+              <Button variant="danger" onClick={handleOpenResetPasswordModal}>Reset Password</Button>
+              </Col>
             </Row>
           </Form>
         </Modal.Body>
@@ -312,6 +382,39 @@ const AdminDashboard = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {showResetPasswordModal && (
+      <Modal show={showResetPasswordModal} onHide={handleCloseResetPasswordModal} centered size="md">
+        <Modal.Header closeButton>
+          <Modal.Title>Reset password</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Row className="mb-3">
+              <Col md={12}>
+                <FloatingLabel controlId="floatingReset" label="Reset Password">
+                  <Form.Control
+                    type="password"
+                    placeholder="Your New Password"
+                    name="reset_password"
+                    value={editFormData.reset_password}
+                    onChange={handleInputChange}
+                  />
+                </FloatingLabel>
+              </Col>
+             </Row>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseResetPasswordModal}>
+            Cancel
+          </Button>
+          <Button variant="outline-danger" onClick={handleResetPassword}>
+           Reset Password
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      )}
 
       {/* Snackbar */}
       <SnackbarComponent
