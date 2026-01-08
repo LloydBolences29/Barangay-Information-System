@@ -10,6 +10,7 @@ import Navigation from "./Navigation";
 // Lazy imports outside component
 const AdminDashboard = lazy(() => import("../component/AdminComponents/AdminDashboard.jsx"));
 const UserManagement = lazy(() => import("../component/AdminComponents/UserManagement.jsx"));
+const AdminSettings = lazy(() => import("../component/AdminComponents/AdminSettings.jsx"));
 const SecretaryComponent = lazy(() => import("../component/SecretaryComponent/ResidentManagement.jsx"));
 const SecretaryDashboard = lazy(() => import("../component/SecretaryComponent/SecretaryDashboard.jsx"));
 const TreasurerComponent = lazy(() => import("../component/TreasurerComponent/TreasurerForm.jsx"));
@@ -39,6 +40,7 @@ const Mainlayout = ({ children, activeComponent: activeComponentOverride, setAct
       componentsRender = [
         { id: "admin-dashboard", label: "Admin Dashboard", componentToBeRendered: <AdminDashboard /> },
         { id: "user-management", label: "User Management", componentToBeRendered: <UserManagement /> },
+        { id: "application-settings", label: "Settings", componentToBeRendered: <AdminSettings /> },
       ];
       break;
     case "captain":

@@ -9,7 +9,7 @@ const cookieParser = require("cookie-parser");
 const userRoutes =  require("./routes/userRoutes");
 const residentRoutes = require("./routes/residentRoutes");
 const statsRoutes = require("./routes/statsRoutes");
-
+const systemSettingsRoutes = require("./routes/systemSettings");
 
 app.use(cors(
     {
@@ -26,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/users", userRoutes);
 app.use("/api/residents", residentRoutes);
 app.use("/api/stats", statsRoutes);
-
+app.use("/api/system-settings", systemSettingsRoutes);
 
 const PORT = process.env.PORT || 1000;
 app.listen(PORT, '0.0.0.0',  () =>{
