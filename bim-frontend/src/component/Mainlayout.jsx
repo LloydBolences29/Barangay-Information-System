@@ -14,6 +14,7 @@ const SecretaryComponent = lazy(() => import("../component/SecretaryComponent/Re
 const SecretaryDashboard = lazy(() => import("../component/SecretaryComponent/SecretaryDashboard.jsx"));
 const TreasurerComponent = lazy(() => import("../component/TreasurerComponent/TreasurerForm.jsx"));
 const TreasurerDashboard = lazy(() => import("../component/TreasurerComponent/TreasurerDashboard.jsx"));
+const CaptainDashboard = lazy(() => import("../component/CaptainComponent/CaptainDashboard.jsx"));
 
 // FIX: Destructure specific props
 const Mainlayout = ({ children, activeComponent: activeComponentOverride, setActiveComponent: setActiveComponentOverride }) => {
@@ -38,6 +39,11 @@ const Mainlayout = ({ children, activeComponent: activeComponentOverride, setAct
       componentsRender = [
         { id: "admin-dashboard", label: "Admin Dashboard", componentToBeRendered: <AdminDashboard /> },
         { id: "user-management", label: "User Management", componentToBeRendered: <UserManagement /> },
+      ];
+      break;
+    case "captain":
+      componentsRender = [
+        { id: "captain-dashboard", label: "Captain Dashboard", componentToBeRendered: <CaptainDashboard /> },
       ];
       break;
     case "secretary":

@@ -12,8 +12,22 @@ router.get("/all-stats", async (req, res) => {
                 (SELECT COUNT(*) FROM resident_info WHERE resident_status = 'inactive') AS total_inactive_residents,
                 (SELECT COUNT(*) FROM households) AS total_households,
                 (SELECT COUNT(*) FROM resident_info WHERE DATE(created_at) = CURDATE()) AS resident_added_today,
-                (SELECT COUNT(*) FROM resident_info WHERE sex = 'male') AS total_male_residents,
-                (SELECT COUNT(*) FROM resident_info WHERE sex = 'female') AS total_female_residents
+                (SELECT COUNT(*) FROM resident_info WHERE sex = 'male' and resident_status = 'active') AS total_male_residents,
+                (SELECT COUNT(*) FROM resident_info WHERE sex = 'female' AND resident_status = 'active') AS total_female_residents,
+                -- Senior Citizens: Anyone 60 years old or older
+                (SELECT COUNT(*) FROM resident_info 
+                WHERE TIMESTAMPDIFF(YEAR, dob, CURDATE()) >= 60 
+                AND resident_status = 'active') AS total_senior_citizens,
+
+                -- SK Eligible (Sangguniang Kabataan): Usually 15 to 30 years old
+                (SELECT COUNT(*) FROM resident_info 
+                 WHERE TIMESTAMPDIFF(YEAR, dob, CURDATE()) BETWEEN 15 AND 30 
+                 AND resident_status = 'active') AS total_sk_eligible,
+
+                -- Minors: Below 18
+                (SELECT COUNT(*) FROM resident_info 
+                 WHERE TIMESTAMPDIFF(YEAR, dob, CURDATE()) < 18 
+                 AND resident_status = 'active') AS total_minors;
         `;
 
     const [rows] = await db.execute(sql, []);

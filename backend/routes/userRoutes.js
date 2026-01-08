@@ -79,7 +79,7 @@ router.post("/register", async (req, res) => {
     const db = await connectToDatabase();
 
     const userCheckSql =
-      "SELECT * FROM user_info WHERE firstname = ? AND lastname = ? AND username = ? AND user_role AND is_first_logged_in = ?";
+      "SELECT * FROM user_info WHERE firstname = ? AND lastname = ? AND username = ? AND user_role = ? AND is_first_logged_in = ?";
     const [existingUsers] = await db.execute(userCheckSql, [
       firstName,
       lastName,
