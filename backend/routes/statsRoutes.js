@@ -60,7 +60,7 @@ router.get("/number-of-added-residents", async (req, res) => {
         GROUP BY DATE_FORMAT(created_at, '%Y-%m')
         ORDER BY DATE_FORMAT(created_at, '%Y-%m') ASC
       `;
-    } 
+    }
     else if (period === "weekly") {
       // Weekly looks okay, but ensures standard "Week U Year" format
       sql = `
@@ -72,17 +72,17 @@ router.get("/number-of-added-residents", async (req, res) => {
         GROUP BY YEARWEEK(created_at)
         ORDER BY YEARWEEK(created_at) ASC
       `;
-    } 
+    }
     else {
       // DEFAULT: GROUP BY DAY (Last 7 Days)
       sql = `
-        SELECT 
-          DATE_FORMAT(created_at, '%Y-%m-%d') as label, 
-          COUNT(*) as count 
-        FROM resident_info 
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-        GROUP BY DATE(created_at)
-        ORDER BY DATE(created_at) ASC
+SELECT 
+      DATE_FORMAT(created_at, '%Y-%m-%d') as label, 
+      COUNT(*) as count 
+    FROM resident_info 
+    WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+    GROUP BY label 
+    ORDER BY label ASC
       `;
     }
 

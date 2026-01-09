@@ -4,6 +4,11 @@ import { AuthProvider } from "./utils/AuthProvider.jsx";
 import ProtectedRoutes from "./utils/ProtectedRoutes.jsx";
 import { ResidentProvider } from "./utils/ResidentContext.jsx";
 import { SettingsProvider } from "./utils/SettingsContext.jsx";
+import socket from "./utils/socketService.jsx";
+
+socket.on("connect", () => {
+  console.log("Connected to socket server with ID:", socket.id);
+});
 
 const LoginForm = lazy(() => import("./pages/Login.jsx"));
 const UserManagement = lazy(() =>
