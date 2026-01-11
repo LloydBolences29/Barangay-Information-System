@@ -66,46 +66,57 @@ router.post("/login", async (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
-    const { firstName, lastName, username, user_password, user_role } =
-      req.body;
+    const { firstName, lastName, username, user_password, user_role } = req.body;
 
     console.log("Registering user:", req.body);
 
-    // Hash the password before storing it and salt it
+    const db = await connectToDatabase();
+
+    // ---------------------------------------------------------
+    // STEP 1: STRICT ROLE CHECKING
+    // "Is there already a person with this role who is ACTIVE?"
+    // ---------------------------------------------------------
+    const activeRoleCheckSql = "SELECT * FROM user_info WHERE user_role = ? AND is_active = 1";
+    const [existingActiveUser] = await db.execute(activeRoleCheckSql, [user_role]);
+
+    // If the array is NOT empty, it means someone is already active.
+    if (existingActiveUser.length > 0) {
+      return res.status(409).json({ 
+        message: `Registration Failed: There is already an ACTIVE account with the role '${user_role}'. Please deactivate the existing user first.` 
+      });
+    }
+
+
+    const usernameCheckSql = "SELECT * FROM user_info WHERE username = ?";
+    const [existingUsername] = await db.execute(usernameCheckSql, [username]);
+
+    if (existingUsername.length > 0) {
+      return res.status(409).json({ message: "Username is already taken." });
+    }
+
+    // ---------------------------------------------------------
+    // STEP 3: REGISTER THE NEW USER
+    // ---------------------------------------------------------
     const salt = bcyrpt.genSaltSync(10);
     const hashedPassword = bcyrpt.hashSync(user_password, salt);
 
-    //connect to database
-    const db = await connectToDatabase();
-
-    const userCheckSql =
-      "SELECT * FROM user_info WHERE firstname = ? AND lastname = ? AND username = ? AND user_role = ? AND is_first_logged_in = ?";
-    const [existingUsers] = await db.execute(userCheckSql, [
-      firstName,
-      lastName,
-      username,
-      user_role,
-      1
-    ]);
-
-    if (existingUsers.length > 0) {
-      return res
-        .status(409)
-        .json({ message: "User with the same details already exists" });
-    }
-
-    const sql =
-      "INSERT INTO user_info (firstname, lastname, username, user_password, user_role, is_active) VALUES (?, ?, ?, ?, ?, ?)";
-    const [result] = await db.execute(sql, [
+    const insertSql =
+      "INSERT INTO user_info (firstname, lastname, username, user_password, user_role, is_active, is_first_logged_in) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    
+    await db.execute(insertSql, [
       firstName,
       lastName,
       username,
       hashedPassword,
       user_role,
-      1,
+      1, 
+      1
     ]);
 
+
+
     return res.status(201).json({ message: "User registered successfully" });
+
   } catch (error) {
     console.error("Error during user registration:", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -177,7 +188,7 @@ router.get("/get-all-users", async (req, res) => {
     const db = await connectToDatabase();
 
     const sql =
-      "SELECT id, firstname, lastname, username, user_role, is_active FROM user_info";
+      "SELECT id, firstname, lastname, username, user_role, is_active FROM user_info where is_active = 1";
     const [rows] = await db.execute(sql);
 
     return res

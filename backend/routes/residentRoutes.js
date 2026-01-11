@@ -439,6 +439,9 @@ router.patch("/soft-delete-resident/:id", async (req, res) => {
 
 })
 
+//getting the info of a current barangay officials
+
+
 
 
 

@@ -110,7 +110,7 @@ const TreasurerDashboard = () => {
                       <thead>
                         <tr>
                           <th>Certificate Type</th>
-                          <th>Resident ID</th>
+                          <th>Resident name</th>
                           <th>Queue Number</th>
                           <th>Action</th>
                         </tr>
@@ -120,7 +120,7 @@ const TreasurerDashboard = () => {
                           {pendingQueues.map((queue) => (
                             <tr key={queue.id}>
                               <td>{queue.certType}</td>
-                              <td>{queue.residentId}</td>
+                              <td>{`${queue.resident_firstname} ${queue.resident_lastname}`}</td>
                               <td>{queue.queueNo}</td>
                               <td>
                                 <div className="d-flex g-2">

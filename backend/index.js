@@ -59,6 +59,8 @@ app.use("/api/system-settings", systemSettingsRoutes);
 app.use("/api/audit-logs", auditLogsRoutes);
 app.use("/api/queues", queueRoutes);
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 const PORT = process.env.PORT || 1000;
 server.listen(PORT, '0.0.0.0',  () =>{
     console.log(`Server is running on port ${PORT}`)

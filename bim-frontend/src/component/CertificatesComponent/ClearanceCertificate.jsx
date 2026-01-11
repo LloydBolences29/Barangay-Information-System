@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
 });
 import brgyLogo from "../../assets/BRGYLOGO.png";
 import pasayLogo from "../../assets/pasayLogo.png";
-const ClearanceCertificate = ({ resident, purpose }) => {
+const ClearanceCertificate = ({ resident, purpose, chairwoman, barangay_name, barangay_logo}) => {
   const date = new Date();
 
   // 2. Extract the parts
@@ -184,7 +184,7 @@ const ClearanceCertificate = ({ resident, purpose }) => {
       <Page size="LETTER" style={styles.page}>
         {/* Watermark logo */}
         <View style={styles.watermarkWrapper}>
-          <Image src={brgyLogo} style={styles.watermarkImage} />
+          <Image src={barangay_logo} style={styles.watermarkImage} />
         </View>
         {/* Existing Header, Title, To Whom It May Concern, and initial text blocks
         will remain above the columns, spanning full width. */}
@@ -201,7 +201,7 @@ const ClearanceCertificate = ({ resident, purpose }) => {
               CERTIFICATE OF SANGGUNIANG BARANGAY
             </Text>
             <Text style={styles.headerBarangay}>
-              Barangay 35, Zone 03, District 01
+              Barangay {barangay_name}
             </Text>
             <Text style={styles.headerRegion}>Pasay City, Metro Manila</Text>
           </View>
@@ -213,7 +213,7 @@ const ClearanceCertificate = ({ resident, purpose }) => {
         <View style={styles.clearanceContainer}>
           <View style={styles.leftWrapper}>
             <Text style={styles.brgyOfficialText}>Barangay Officials</Text>
-            <Text style={styles.officialNameText}>Lily M. Balanon</Text>
+            <Text style={styles.officialNameText}>{chairwoman}</Text>
             <Text style={styles.positionText}>Barangay Chairwoman</Text>
             <Text style={styles.officialNameText}>Sunny Boy Loriezo</Text>
             <Text style={styles.positionText}>Barangay Kagawad</Text>
@@ -319,7 +319,7 @@ const ClearanceCertificate = ({ resident, purpose }) => {
                 textAlign: "right",
               }}
             >
-              Lily M. Balanon
+              {chairwoman}
             </Text>
             <Text style={{ fontSize: 12, textAlign: "right" }}>
               Punong Barangay

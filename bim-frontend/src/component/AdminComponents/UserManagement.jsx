@@ -44,11 +44,11 @@ const UserManagement = () => {
         body: JSON.stringify(payload),
       });
 
+      const data = await res.json();
       if (res.ok) {
-        const data = await res.json();
         setPageStatus("success");
         setSuccessSnackBarStatus(true);
-        setNotificationMessage("User registered successfully");
+        setNotificationMessage(data.message);
         setPayload({
           firstName: "",
           lastName: "",
@@ -60,7 +60,7 @@ const UserManagement = () => {
       } else {
         setPageStatus("failed");
         setFailedSnackBarStatus(true);
-        setNotificationMessage("Failed to register user. Please try again.");
+        setNotificationMessage(data.message);
       }
     } catch (error) {
       console.error("Error during user registration:", error);

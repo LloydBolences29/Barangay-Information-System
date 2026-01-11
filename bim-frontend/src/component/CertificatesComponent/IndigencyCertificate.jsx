@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
 
 import brgyLogo from "../../assets/BRGYLOGO.png";
 import pasayLogo from "../../assets/pasayLogo.png";
-const IndigencyCertificate = ({ resident, purpose }) => {
+const IndigencyCertificate = ({ resident, purpose, chairwoman, barangay_name, barangay_logo }) => {
   const date = new Date();
 
   // 2. Extract the parts
@@ -156,7 +156,7 @@ const IndigencyCertificate = ({ resident, purpose }) => {
         will remain above the columns, spanning full width. */}
         <View style={styles.headerContainer}>
           {/* Left Logo */}
-          <Image src={brgyLogo} style={styles.leftLogo} />
+          <Image src={barangay_logo} style={styles.leftLogo} />
 
           {/* Center Text */}
           <View style={styles.headerTextContainer}>
@@ -167,7 +167,7 @@ const IndigencyCertificate = ({ resident, purpose }) => {
               CERTIFICATE OF SANGGUNIANG BARANGAY
             </Text>
             <Text style={styles.headerBarangay}>
-              Barangay 35, Zone 03, District 01
+              Barangay {barangay_name}
             </Text>
             <Text style={styles.headerRegion}>Pasay City, Metro Manila</Text>
           </View>
@@ -178,7 +178,7 @@ const IndigencyCertificate = ({ resident, purpose }) => {
 
         <View style={styles.indigencyContainer}>
           <View style={styles.leftWrapper}>
-            <Text style={styles.officialNameText}>Lily M. Balanon</Text>
+            <Text style={styles.officialNameText}>{chairwoman}</Text>
             <Text style={styles.positionText}>Barangay Chairwoman</Text>
             <Text style={styles.officialNameText}>Sunny Boy Loriezo</Text>
             <Text style={styles.positionText}>Barangay Kagawad</Text>
@@ -284,7 +284,7 @@ const IndigencyCertificate = ({ resident, purpose }) => {
                 textAlign: "right",
               }}
             >
-              Lily M. Balanon
+              {chairwoman}
             </Text>
             <Text style={{ fontSize: 12, textAlign: "right" }}>
               Barangay Chairwoman

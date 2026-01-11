@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import "./CaptainDashboard.css";
-
+import { useSettings } from "../../utils/SettingsContext";
+import { Button, Table, Modal } from "react-bootstrap";
+import socket from "../../utils/socketService";
+import SnackbarComponent from "../SnackbarComponent";
 //imports of charts
 import LineChartComponent from "../Charts/LineChartComponent";
 import GenderPieChart from "../Charts/GenderPieChart";
@@ -13,10 +16,29 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 
 const CaptainDashboard = () => {
+  const { settings } = useSettings();
   const VITE_API_URL = import.meta.env.VITE_API_URL;
   const [numbersofResidentsAdded, setNumbersofResidentsAdded] = useState([]);
   const [allStats, setAllStats] = useState([]);
+  const [acceptShowModal, setAcceptShowModal] = useState(false);
+  const [selectedQueue, setSelectedQueue] = useState(null);
   const [period, setPeriod] = useState("7days");
+  const [captainQueues, setCaptainQueues] = useState([]); 
+  const [pageStatus, setPageStatus] = useState("idle"); 
+  const [successSnackBarStatus, setSuccessSnackBarStatus] = useState(false);
+  const [failedSnackBarStatus, setFailedSnackBarStatus] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [queueMessage, setQueueMessage] = useState("No pending queues.");
+
+  const handleSnackBarClose = (event, reason) => {
+    setSuccessSnackBarStatus(false);
+    setFailedSnackBarStatus(false);
+  };
+
+    const handleOpenAcceptModal = (queue) => {
+    setSelectedQueue(queue);
+    setAcceptShowModal(true);
+  };
   const fetchNumbersOfResidentsAdded = async () => {
     try {
       const res = await fetch(
@@ -74,6 +96,54 @@ const CaptainDashboard = () => {
     setPeriod(event.target.value);
   };
 
+  const handleApprove = async () => {
+    try {
+      const response = await fetch(
+        `${VITE_API_URL}/api/queues/captain-approve/${selectedQueue.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        setPageStatus("success");
+        setNotificationMessage(data.message);
+        setSuccessSnackBarStatus(true);
+        setAcceptShowModal(false);
+        refreshAllQueues();
+      } else {
+        setPageStatus("error");
+        setNotificationMessage(data.message);
+        setFailedSnackBarStatus(true);
+      }
+    } catch (error) {
+      console.log("Error approving:", error);
+      setPageStatus("error");
+      setNotificationMessage("Failed to approve.");
+      setFailedSnackBarStatus(true);
+    }
+  };
+
+  const fetchCaptainQueues = useCallback(async () => {
+    try {
+      const res = await fetch(
+        `${VITE_API_URL}/api/queues/captain-approval-queues`
+      );
+      if (res.ok) setCaptainQueues(await res.json());
+    } catch (err) {
+      console.error(err);
+    }
+  }, [VITE_API_URL]);
+
+  const refreshAllQueues = useCallback(() => {
+    console.log("Refreshing all tables...");
+    fetchCaptainQueues();
+  }, [fetchCaptainQueues]);
+
   useEffect(() => {
     fetchNumbersOfResidentsAdded();
   }, [period]);
@@ -81,7 +151,27 @@ const CaptainDashboard = () => {
   useEffect(() => {
     fetchAllStats();
   }, []);
+
+  useEffect(() => {
+    // Initial Load
+    refreshAllQueues();
+
+    // Listen for the signal
+    const handleQueueUpdate = (data) => {
+      console.log("Socket Update Received:", data);
+      refreshAllQueues(); // <--- This updates the screen instantly!
+    };
+
+    socket.on("refresh_queue", handleQueueUpdate);
+
+    // Cleanup
+    return () => {
+      socket.off("refresh_queue", handleQueueUpdate);
+    };
+  }, [refreshAllQueues]);
+
   console.log("All Stats", allStats);
+
   return (
     <>
       <div id="main-secretary-dashboard">
@@ -90,6 +180,55 @@ const CaptainDashboard = () => {
         </div>
         <div className="dashboard-container">
           <div className="dashboard-wrapper">
+            {settings.payment_required && (
+              <div className="queueing-dashboard">
+                <h2>Queueing Dashboard</h2>
+                <div className="queueing-stats">
+                  <div className="pending-card">
+                    <Table striped bordered hover>
+                      <thead>
+                        <tr>
+                          <th>Certificate Type</th>
+                          <th>Resident name</th>
+                          <th>Queue Number</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      {captainQueues.length > 0 ? (
+                        <tbody>
+                          {captainQueues.map((queue) => (
+                            <tr key={queue.id}>
+                              <td>{queue.certType}</td>
+                              <td>{`${queue.resident_firstname} ${queue.resident_lastname}`}</td>
+                              <td>{queue.queueNo}</td>
+                              <td>
+                                <div className="d-flex g-2">
+                                  <Button
+                                    variant="outline-success"
+                                    onClick={() => handleOpenAcceptModal(queue)}
+                                  >
+                                    Approve
+                                  </Button>
+                                  <Button variant="outline-danger">
+                                    Decline
+                                  </Button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      ) : (
+                        <tbody>
+                          <tr>
+                            <td colSpan="4">{queueMessage}</td>
+                          </tr>
+                        </tbody>
+                      )}
+                    </Table>
+                  </div>
+                </div>
+              </div>
+            )}
             <div id="counter-wrapper">
               <div className="chart-header">
                 <div className="counter-name">
@@ -162,6 +301,44 @@ const CaptainDashboard = () => {
                 />
               </div>
             </div>
+
+            {acceptShowModal && (
+              <Modal
+                show={acceptShowModal}
+                onHide={() => setAcceptShowModal(false)}
+                centered
+                size="md"
+              >
+                <Modal.Header closeButton>
+                  <Modal.Title>Accept Payment</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <p>
+                    Are you sure you want to approve Queue Number:{" "}
+                    {selectedQueue.queueNo}?
+                  </p>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setAcceptShowModal(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button variant="outline-success" onClick={handleApprove}>
+                   Approve
+                  </Button>
+                </Modal.Footer>
+              </Modal>
+            )}
+
+            <SnackbarComponent
+              pageState={pageStatus}
+              notification={notificationMessage}
+              successSnackBarState={successSnackBarStatus}
+              failedSnackBarState={failedSnackBarStatus}
+              handleClose={handleSnackBarClose}
+            />
           </div>
         </div>
       </div>

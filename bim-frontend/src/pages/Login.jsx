@@ -6,17 +6,17 @@ import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import barangayLogo from "../assets/BRGYLOGO.png";
 // IMPORTANT: Replace this with your actual logo file
-// import barangayLogo from "../assets/barangay-logo.png"; 
+// import barangayLogo from "../assets/barangay-logo.png";
 
 const Login = () => {
   const VITE_API_URL = import.meta.env.VITE_API_URL;
   const { setAuth } = useAuth();
   const navigate = useNavigate();
-  
+
   // --- NEW STATE FOR SPLASH SCREEN ---
   // Controls when the splash screen starts fading out
-  const [splashFading, setSplashFading] = useState(false); 
-  
+  const [splashFading, setSplashFading] = useState(false);
+
   // Controls when the splash screen is removed from the DOM entirely
   const [showSplash, setShowSplash] = useState(true);
 
@@ -24,24 +24,9 @@ const Login = () => {
   const [loginSuccessMessage, setLoginSuccessMessage] = useState("");
   const [loginError, setLoginError] = useState("");
   const [showLoginPassword, setShowLoginPassword] = useState(false);
-
+  const [barangayName, setBarangayName] = useState("");
+  const [currentLogo, setCurrentLogo] = useState("");
   // --- TRANSITION EFFECT LOGIC ---
-  useEffect(() => {
-    // 1. After 2 seconds, start fading out the logo
-    const fadeTimer = setTimeout(() => {
-      setSplashFading(true);
-    }, 2000);
-
-    // 2. After the fade animation (0.5s) finishes, remove the splash from DOM
-    const removeTimer = setTimeout(() => {
-      setShowSplash(false);
-    }, 2500); // 2000ms delay + 500ms transition
-
-    return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(removeTimer);
-    };
-  }, []);
 
   const handleOnSubmit = async (e) => {
     e.preventDefault();
@@ -59,23 +44,38 @@ const Login = () => {
         setLoginError("");
         setLoginSuccessMessage("Login successful! Redirecting...");
 
-        console.log("Login successful:", res.user); 
+        console.log("Login successful:", res.user);
 
         setTimeout(() => {
           setLoginSuccessMessage("");
-          setAuth({ loading: false, isAuthenticated: true, user: res.user, is_first_logged_in: res.user.is_first_logged_in });
+          setAuth({
+            loading: false,
+            isAuthenticated: true,
+            user: res.user,
+            is_first_logged_in: res.user.is_first_logged_in,
+          });
 
           if (res.user.is_first_logged_in) {
             navigate("/change-password");
             return;
           }
-          
+
           switch (res.user?.role) {
-            case "admin": navigate("/admin"); break;
-            case "captain": navigate("/captain"); break;
-            case "secretary": navigate("/secretary"); break;
-            case "treasurer": navigate("/treasurer"); break;
-            default: navigate("/"); break;
+            case "admin":
+              navigate("/admin");
+              break;
+            case "captain":
+              navigate("/captain");
+              break;
+            case "secretary":
+              navigate("/secretary");
+              break;
+            case "treasurer":
+              navigate("/treasurer");
+              break;
+            default:
+              navigate("/");
+              break;
           }
         }, 2500);
       } else {
@@ -88,31 +88,77 @@ const Login = () => {
     }
   };
 
+  //get the current barangay information
+  const fetchBarangayInformation = async () => {
+    try {
+      const response = await fetch(
+        `${VITE_API_URL}/api/system-settings/get-settings`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setBarangayName(data.brgyName || "Barangay 35");
+        setCurrentLogo(
+          data.brgyLogo
+            ? `${VITE_API_URL}/uploads/${data.brgyLogo}`
+            : barangayLogo
+        );
+      }
+    } catch (error) {
+      console.log("Error fetching barangay information:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBarangayInformation();
+    // 1. After 2 seconds, start fading out the logo
+    const fadeTimer = setTimeout(() => {
+      setSplashFading(true);
+    }, 2000);
+
+    // 2. After the fade animation (0.5s) finishes, remove the splash from DOM
+    const removeTimer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2500); // 2000ms delay + 500ms transition
+
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(removeTimer);
+    };
+  }, []);
   return (
     <div className="login-background">
-      
       {/* --- SPLASH SCREEN OVERLAY --- */}
       {showSplash && (
         <div className={`splash-overlay ${splashFading ? "fade-out" : ""}`}>
           <div className="splash-content">
-            {/* Replace src below with {barangayLogo} */}
-            <img 
-              src={barangayLogo} 
-              alt="Barangay Logo" 
-              className="splash-logo" 
-              
+            <img
+              src={currentLogo } // Use fetched logo, fallback to default import
+              alt="Barangay Logo"
+              className="splash-logo"
             />
-            <h2 className="splash-text">Barangay 35 Information System</h2>
+            <h2 className="splash-text">
+              {`Barangay ${barangayName} Information System ` ||
+                "Barangay 35 Information System"}{" "}
+            </h2>
           </div>
         </div>
       )}
 
       {/* --- MAIN LOGIN CONTENT --- */}
       {/* We add 'content-visible' class when splash starts fading to trigger entry animation */}
-      <Container id="login-main-container" className={splashFading ? "content-visible" : "content-hidden"}>
-        
+      <Container
+        id="login-main-container"
+        className={splashFading ? "content-visible" : "content-hidden"}
+      >
         <div id="welcome-header-text" className="text-center">
-          <h1>Barangay 35 Information System</h1>
+          <h1>
+            {`Barangay ${barangayName} Information System ` ||
+              "Barangay 35 Information System"}
+          </h1>
           <p className="subtitle">Secure Management Portal</p>
         </div>
 
@@ -131,7 +177,9 @@ const Login = () => {
                   type="text"
                   value={payload.username}
                   placeholder="Enter your username"
-                  onChange={(e) => setPayload({ ...payload, username: e.target.value })}
+                  onChange={(e) =>
+                    setPayload({ ...payload, username: e.target.value })
+                  }
                   required
                 />
               </Form.Group>
@@ -144,7 +192,9 @@ const Login = () => {
                     type={showLoginPassword ? "text" : "password"}
                     value={payload.password}
                     placeholder="Enter your password"
-                    onChange={(e) => setPayload({ ...payload, password: e.target.value })}
+                    onChange={(e) =>
+                      setPayload({ ...payload, password: e.target.value })
+                    }
                     required
                   />
                   <span
@@ -156,8 +206,14 @@ const Login = () => {
                 </div>
               </Form.Group>
 
-              {loginError && <div className="alert-message error">{loginError}</div>}
-              {loginSuccessMessage && <div className="alert-message success">{loginSuccessMessage}</div>}
+              {loginError && (
+                <div className="alert-message error">{loginError}</div>
+              )}
+              {loginSuccessMessage && (
+                <div className="alert-message success">
+                  {loginSuccessMessage}
+                </div>
+              )}
 
               <Button className="w-100 login-btn" type="submit">
                 Sign In

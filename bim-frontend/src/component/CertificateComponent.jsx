@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../styles/CertificateComponent.css";
 import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 import {
@@ -36,6 +36,10 @@ const CertificateComponent = ({ selectedResident }) => {
     reqStatus: "Pending",
     updatedByUserId: 1, //this should be dynamic based on the logged in user
   });
+  const [barangayName, setBarangayName] = useState("");
+  const [currentLogo, setCurrentLogo] = useState("");
+
+  const [barangayOfficials, setBarangayOfficials] = useState([]);
 
   const handleOpen = (type) => {
     setCertType(type);
@@ -44,15 +48,64 @@ const CertificateComponent = ({ selectedResident }) => {
     setShowModal(true);
   };
 
+
+  //fetch all the barangay information
+  const fetchBarangayInformation = async () => {
+    try {
+      const response = await fetch(
+        `${VITE_API_URL}/api/system-settings/get-settings`
+      );
+      const data = await response.json();
+      if(response.ok){
+        setBarangayName(data.brgyName || "Barangay 35");
+        setCurrentLogo(
+          data.brgyLogo
+            ? `${VITE_API_URL}/uploads/${data.brgyLogo}`
+            : barangayLogo
+        );
+      }
+    } catch (error) {
+      console.log("Error fetching barangay information:", error);
+    }
+  }
+  //get all the information of the user
+  const fetchCurrentBarangayOfficial = async () => {
+    try {
+      const response = await fetch(
+        `${VITE_API_URL}/api/users/get-all-users`
+      )
+
+      const data = await response.json()
+      if(response.ok){
+        console.log("Current Barangay Official Data:", data.users);
+        setBarangayOfficials(data.users);
+
+      }else{
+        console.error("Failed to fetch barangay official:", data.message);
+      }
+      
+    } catch (error) {
+      console.log("Error fetching barangay official:", error);
+    }
+  }
+
+  const captain = barangayOfficials.find(
+  (official) => official.user_role === "captain" || official.user_role === "Captain"
+);
+
+const captainName = captain 
+  ? `${captain.firstname} ${captain.lastname}` 
+  : "Hon. Acting Captain"; // Fallback name
+
   const renderDocument = (type) => {
     if (type === "Indigency") {
       return (
-        <IndigencyCertificate resident={selectedResident} purpose={purpose} />
+        <IndigencyCertificate resident={selectedResident} purpose={purpose} chairwoman={captainName} barangay_name={barangayName} barangay_logo={currentLogo} />
       );
     }
     if (type === "Clearance") {
       return (
-        <ClearanceCertificate resident={selectedResident} purpose={purpose} />
+        <ClearanceCertificate resident={selectedResident} purpose={purpose} chairwoman={captainName} barangay_name={barangayName} barangay_logo={currentLogo} />
       );
     }
 
@@ -127,6 +180,12 @@ const CertificateComponent = ({ selectedResident }) => {
       console.error("Error in handleDownloadAndQueue:", error);
     }
   };
+
+  useEffect(() =>{
+    fetchCurrentBarangayOfficial();
+    fetchBarangayInformation();
+    fetchCurrentBarangayOfficial();
+  }, [])
 
   console.log("CertificateComponent selectedResident:", selectedResident);
   return (
